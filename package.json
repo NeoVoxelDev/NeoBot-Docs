@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "@types/dom-view-transitions": "^1.0.6",
+    "vitepress-sidebar": "^1.33.0"
+  },
+  "dependencies": {
+    "vue": "^3.5.22"
+  }
+}
