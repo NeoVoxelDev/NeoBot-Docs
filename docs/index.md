@@ -12,7 +12,7 @@ hero:
     - theme: primary
       text: 进入文档
       icon: fa-solid fa-book
-      link: /zh/description
+      link: /description/description
     - theme: alt
       text: GitHub
       link: https://github.com/NeoVoxelDev/NeoBot
