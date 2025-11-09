@@ -5,12 +5,14 @@
     "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
     "@types/dom-view-transitions": "^1.0.6",
+    "canvas-confetti": "^1.9.4",
+    "less": "^4.4.2",
+    "medium-zoom": "^1.1.0",
     "vitepress-sidebar": "^1.33.0"
   },
   "dependencies": {
-    "medium-zoom": "^1.1.0",
-    "vitepress": "^1.6.4",
     "vue": "^3.5.22"
   }
 }

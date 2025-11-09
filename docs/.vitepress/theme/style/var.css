@@ -1,4 +1,5 @@
 /* var.css */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 :root {
   --vp-c-brand-1: #18794e;
   --vp-c-brand-2: #299764;
@@ -38,4 +39,48 @@
 
 .VPFeatures .items .item:hover {
   transform: translateY(-5px);
+}
+
+.medium-zoom-overlay {
+  z-index: 30;
+}
+.medium-zoom-image {
+  z-index: 9999 !important;
+}
+
+.VPFooter.vp-footer,
+footer.VPFooter,
+.VPFooter {
+  background: transparent !important;
+  background-color: transparent !important;
+  border-top: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.VPFooter .container,
+.VPFooter .vp-doc,
+.VPFooter > div {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.dark .VPFooter.vp-footer,
+.dark footer.VPFooter,
+.dark .VPFooter {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+.VPHero .VPButton.medium.primary {
+  background: linear-gradient(135deg, #18794e, #30a46c) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.VPHero .VPButton.medium.primary:hover {
+  background: linear-gradient(135deg, #299764, #3dd68c) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(24, 121, 78, 0.4);
 }

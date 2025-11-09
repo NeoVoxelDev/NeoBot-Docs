@@ -1,2 +1,0 @@
-# NeoBot-Docs
-NeoBot
