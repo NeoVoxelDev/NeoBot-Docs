@@ -52,7 +52,7 @@ const defaultMembers = [
     name: 'mc506lw',
     title: '开发者',
     links: [
-      { icon: 'github', link: 'https://github.com/3462689887' },
+      { icon: 'github', link: 'https://github.com/mc506lw' },
       { icon : 'QQ', link: 'http://wpa.qq.com/msgrd?v=3&uin=3462689887&site=qq&menu=yes' }
     ]
   }
