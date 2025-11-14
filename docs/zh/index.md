@@ -1,0 +1,35 @@
+---
+# https://vitepress.dev/reference/default-theme-home-page
+layout: home
+
+hero:
+  name: "NeoBot V3"
+  tagline: "连接 Minecraft 与 多平台 聊天工具 的 高效插件"
+  image:
+    src: ../image/NeoBot.png
+    alt: NeoBot
+  actions:
+    - theme: primary
+      text: 进入文档
+      icon: fa-solid fa-book
+      link: /zh/description
+    - theme: alt
+      text: GitHub
+      link: https://github.com/NeoVoxelDev/NeoBot
+
+
+features:
+  - icon: ⚡
+    title: 轻量高效  
+    details: 插件核心体积不足1MB，运行效率极高且资源占用极低。
+  - icon: 🛠️
+    title: 稳定可靠 
+    details: 插件经过严格测试，确保在各种环境下稳定运行。
+  - icon: 👋
+    title: 高度自定义
+    details: 提供多种JavaScript接口，便于二次开发者进行深度定制。
+  - icon: 🚀
+    title: 强大兼容性
+    details: 可兼容Leaves,Leaf,Paper,Purpur等多种主流服务器。
+---
+<Confetti />

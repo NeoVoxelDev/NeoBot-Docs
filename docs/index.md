@@ -4,15 +4,15 @@ layout: home
 
 hero:
   name: "NeoBot V3"
-  tagline: "连接 Minecraft 与 多平台 聊天工具 的 高效插件"
+  tagline: "连接 Minecraft 与 多平台 聊天软件 的 高效插件"
   image:
-    src: ./img/NeoBot.png
+    src: ./image/NeoBot.png
     alt: NeoBot
   actions:
     - theme: primary
       text: 进入文档
       icon: fa-solid fa-book
-      link: /docs/description
+      link: /zh/description
     - theme: alt
       text: GitHub
       link: https://github.com/NeoVoxelDev/NeoBot
