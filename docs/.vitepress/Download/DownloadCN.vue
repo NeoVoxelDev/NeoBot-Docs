@@ -48,12 +48,12 @@ interface DownloadItem {
 const list: Ref<DownloadItem[]> = ref([])
 
 const githubLatestRelease = async () => {
-  const res = await fetch('https://api.github.com/repos/alazeprt/AQQBot/releases/latest')
+  const res = await fetch('https://api.github.com/repos/NeoVoxelDev/NeoBot/releases/latest')
   const data = await res.json()
   return {
     source: {
       name: 'Github Releases',
-      link: 'https://github.com/alazeprt/AQQBot/releases'
+      link: 'https://github.com/NeoVoxelDev/NeoBot/releases'
     },
     version: data.tag_name,
     release: data.html_url,
@@ -67,41 +67,41 @@ const githubLatestRelease = async () => {
 }
 
 const githubRunartifacts = async (run: any) => {
-  const res = await fetch(`https://api.github.com/repos/alazeprt/AQQBot/actions/runs/${run.id}/artifacts`)
+  const res = await fetch(`https://api.github.com/repos/NeoVoxelDev/NeoBot/actions/runs/${run.id}/artifacts`)
   const data = await res.json()
   return data.artifacts.map((item: { name: any; id: any; }) => {
     return {
       name: `${item.name}.zip`,
-      link: `https://github.com/alazeprt/AQQBot/actions/runs/${run.id}/artifacts/${item.id}`
+      link: `https://github.com/NeoVoxelDev/NeoBot/actions/runs/${run.id}/artifacts/${item.id}`
     }
   })
 }
 
 const githubLatestBuild = async () => {
-  const res = await fetch('https://api.github.com/repos/alazeprt/AQQBot/actions/workflows/gradle.yml/runs?per_page=1&status=success')
+  const res = await fetch('https://api.github.com/repos/NeoVoxelDev/NeoBot/actions/workflows/gradle.yml/runs?per_page=1&status=success')
   const data = await res.json()
   const run = data.workflow_runs[0]
   return {
     source: {
       name: 'Github Actions',
-      link: 'https://github.com/alazeprt/AQQBot/actions/workflows/gradle.yml'
+      link: 'https://github.com/NeoVoxelDev/NeoBot/actions/workflows/gradle.yml'
     },
-    version: `v4.0.0-gradle.${run.head_sha.substring(0, 7)}`,
+    version: `Gradle-${run.head_sha.substring(0, 7)}`,
     release: run.html_url,
     download: await githubRunartifacts(run)
   }
 }
 
 const giteeLatestRelease = async () => {
-  const res = await fetch('https://gitee.com/api/v5/repos/alazeprt/AQQBot/releases/latest')
+  const res = await fetch('https://gitee.com/api/v5/repos/NeoVoxelDev/NeoBot/releases/latest')
   const data = await res.json()
   return {
     source: {
       name: 'Gitee 发行版',
-      link: 'https://gitee.com/alazeprt/AQQBot/releases'
+      link: 'https://gitee.com/NeoVoxelDev/NeoBot/releases'
     },
     version: data.tag_name,
-    release: `https://gitee.com/alazeprt/AQQBot/releases/tag/${data.tag_name}`,
+    release: `https://gitee.com/NeoVoxelDev/NeoBot/releases/tag/${data.tag_name}`,
     download: data.assets.filter((item: any) => {
       return item.name.endsWith('.jar')
     }).map((item: any) => {
@@ -119,24 +119,24 @@ const spigotmcLatestUpdate = async () => {
   return `https://www.spigotmc.org/resources/83027/update?update=${data.id}`
 }
 
-const spigotmcLatestVersion = async () => {
-  const res = await fetch('https://api.spiget.org/v2/resources/83027/versions/latest')
+/* const spigotmcLatestVersion = async () => {
+  const res = await fetch('https://api.spiget.org/v2/resources/8301127/versions/latest')
   const data = await res.json()
   return {
     source: {
       name: 'SpigotMC',
-      link: 'https://www.spigotmc.org/resources/83027/'
+      link: 'https://www.spigotmc.org/resources/8311027/'
     },
     version: `${data.name}`,
     release: await spigotmcLatestUpdate(),
     download: [
       {
         name: 'ZMusic Latest',
-        link: `https://www.spigotmc.org/resources/83027/download?version=${data.id}`
+        link: `https://www.spigotmc.org/resources/8301127/download?version=${data.id}`
       }
     ] as any
   }
-}
+} */
 
 onMounted(async () => {
   try {
@@ -160,12 +160,12 @@ onMounted(async () => {
     console.error(e)
   }
 
-  try {
+  /*try {
     const data = await spigotmcLatestVersion()
     list.value.push(data)
   } catch (e) {
     console.error(e)
-  }
+  }*/
 })
 </script>
 

@@ -1,0 +1,172 @@
+<template>
+  <div>
+    <table>
+      <thead>
+        <tr>
+          <th>Channel</th>
+          <th>Version</th>
+          <th>Release</th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="item in list">
+          <td><a target="_blank" :href="item.source.link">{{ item.source.name }}</a></td>
+          <td>{{ item.version }}</td>
+          <td><a target="_blank" :href="item.release">View release</a></td>
+          <td>
+            <span v-for="download in item.download">
+              <a target="_blank" :href="download.link">{{ download.name }}</a>
+              <br />
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ul></ul>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import { Ref, onMounted, ref } from 'vue'
+
+interface DownloadItem {
+  source: {
+    name: string,
+    link: string
+  }
+  version: string
+  release: string
+  download: [
+    {
+      name: string,
+      link: string
+    }
+  ]
+}
+
+const list: Ref<DownloadItem[]> = ref([])
+
+const githubLatestRelease = async () => {
+  const res = await fetch('https://api.github.com/repos/NeoVocelDev/NeoBot/releases/latest')
+  const data = await res.json()
+  return {
+    source: {
+      name: 'Github Releases',
+      link: 'https://github.com/NeoVocelDev/NeoBot/releases'
+    },
+    version: data.tag_name,
+    release: data.html_url,
+    download: data.assets.map((item: any) => {
+      return {
+        name: item.name,
+        link: item.browser_download_url
+      }
+    })
+  }
+}
+
+const githubRunartifacts = async (run: any) => {
+  const res = await fetch(`https://api.github.com/repos/NeoVocelDev/NeoBot/actions/runs/${run.id}/artifacts`)
+  const data = await res.json()
+  return data.artifacts.map((item: { name: any; id: any; }) => {
+    return {
+      name: `${item.name}.zip`,
+      link: `https://github.com/NeoVocelDev/NeoBot/actions/runs/${run.id}/artifacts/${item.id}`
+    }
+  })
+}
+
+const githubLatestBuild = async () => {
+  const res = await fetch('https://api.github.com/repos/NeoVocelDev/NeoBot/actions/workflows/gradle.yml/runs?per_page=1&status=success')
+  const data = await res.json()
+  const run = data.workflow_runs[0]
+  return {
+    source: {
+      name: 'Github Actions',
+      link: 'https://github.com/NeoVocelDev/NeoBot/actions/workflows/gradle.yml'
+    },
+    version: `Gradle-${run.head_sha.substring(0, 7)}`,
+    release: run.html_url,
+    download: await githubRunartifacts(run)
+  }
+}
+
+const giteeLatestRelease = async () => {
+  const res = await fetch('https://gitee.com/api/v5/repos/NeoVocelDev/NeoBot/releases/latest')
+  const data = await res.json()
+  return {
+    source: {
+      name: 'Gitee Releases',
+      link: 'https://gitee.com/NeoVocelDev/NeoBot/releases'
+    },
+    version: data.tag_name,
+    release: `https://gitee.com/NeoVocelDev/NeoBot/releases/tag/${data.tag_name}`,
+    download: data.assets.filter((item: any) => {
+      return item.name.endsWith('.jar')
+    }).map((item: any) => {
+      return {
+        name: item.name,
+        link: item.browser_download_url
+      }
+    })
+  }
+}
+
+const spigotmcLatestUpdate = async () => {
+  const res = await fetch('https://api.spiget.org/v2/resources/83027/updates/latest')
+  const data = await res.json()
+  return `https://www.spigotmc.org/resources/83027/update?update=${data.id}`
+}
+
+/*const spigotmcLatestVersion = async () => {
+  const res = await fetch('https://api.spiget.org/v2/resources/83027/versions/latest')
+  const data = await res.json()
+  return {
+    source: {
+      name: 'SpigotMC',
+      link: 'https://www.spigotmc.org/resources/83027/'
+    },
+    version: `${data.name}`,
+    release: await spigotmcLatestUpdate(),
+    download: [
+      {
+        name: 'ZMusic Latest',
+        link: `https://www.spigotmc.org/resources/83027/download?version=${data.id}`
+      }
+    ] as any
+  }
+} */
+
+onMounted(async () => {
+  try {
+    const data = await githubLatestRelease()
+    list.value.push(data)
+  } catch (e) {
+    console.error(e)
+  }
+
+  try {
+    const data = await githubLatestBuild()
+    list.value.push(data)
+  } catch (e) {
+    console.error(e)
+  }
+
+  try {
+    const data = await giteeLatestRelease()
+    list.value.push(data)
+  } catch (e) {
+    console.error(e)
+  }
+
+  /*try {
+    const data = await spigotmcLatestVersion()
+    list.value.push(data)
+  } catch (e) {
+    console.error(e)
+  }*/
+})
+</script>
+
+<style lang="scss" scoped></style>

@@ -1,18 +1,21 @@
-# 介绍
-NeoVoxel 是由 *NeoVoxel Team* 开发的一款 将 `Minecraft` 与 `QQ`,`Discord`,`Telegram`,`kook`等 连接的插件。
-NeoVoxel 旨在为服务器管理员和玩家提供卓越的体验。
-## 特性
-- 多平台支持：兼容主流聊天平台如QQ, Discord, Telegram, kook等。
-- 账户绑定: 允许玩家只有绑定聊天平台账户后才能在服务器中进行游戏。
-- 群服互通：支持将Minecraft服务器与多个聊天平台连接，实现跨平台交流。
-- 实时通知：在聊天平台上实时推送服务器事件和玩家活动通知。
-- 信息查询：允许玩家通过聊天平台查询服务器1111状态、在线玩家等信息。
-## 开发团队
-<VPTeamMembers />
+# Introduction
+NeoBot is a plugin developed by *NeoVoxel Team* that connects `Minecraft` with `QQ`, `Discord`, `Telegram`, `Kook`, and other platforms.
+NeoBot aims to provide an exceptional experience for server administrators and players.
+
+## Features
+- Multi-platform support: Compatible with mainstream chat platforms such as QQ, Discord, Telegram, Kook, and more.
+- Account binding: Allows players to bind their chat platform accounts before participating in the server.
+- Cross-platform communication: Supports connecting Minecraft servers with multiple chat platforms for seamless cross-platform interaction.
+- Real-time notifications: Pushes server events and player activity notifications to chat platforms in real-time.
+- Information queries: Enables players to query server status, online players, and other information through chat platforms.
+
+## Development Team
+<TeamMembersEN />
+
 ::: warning
-本项目仍在开发中，文档内容可能不完整或存在错误，敬请谅解。
+This project is still under development. Documentation may be incomplete or contain errors. We apologize for any inconvenience.
 :::
+
 ::: danger
-尚未完工
+Not yet completed
 :::
-<update />
