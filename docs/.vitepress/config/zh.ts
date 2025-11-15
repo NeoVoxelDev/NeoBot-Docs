@@ -26,12 +26,12 @@ export const zhConfig: LocaleSpecificConfig<DefaultTheme.Config> = {
       label: '目录'
     },
     editLink: {
-      pattern: 'https://github.com/vuejs/vitepress/edit/main/docs/:path',
+      pattern: 'https://github.com/NeoVoxelDev/NeoBot-Docs/edit/main/docs/:path',
       text: '在 GitHub 上编辑此页'
     },
     outlineTitle: '当前页大纲',
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+      { icon: 'github', link: 'https://github.com/NeoVoxelDev/NeoBot-Docs' }
     ],
 
   }

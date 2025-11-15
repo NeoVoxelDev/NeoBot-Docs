@@ -4,9 +4,9 @@
 
 ## 一、前提条件
 - Java 运行环境：推荐 Java 17 或更高（与服务端版本一致）。
-- 已准备可运行的 Minecraft 服务端（Paper、Purpur 等）。
+- 已准备可运行的 Minecraft 服务端（Paper、Leaves 等）。
 - 拥有服务端文件夹的读写权限和重启/启动服务端的能力。
-- 若需对接聊天平台（QQ/Discord/Telegram/Kook），需提前在对应平台申请机器人 Token / API Key 并记录。
+- 若需对接聊天平台（QQ/Discord/Telegram/Kook），需提前在对应平台申请机器人 Token / API Key 并记录(QQ机器人暂未适配,仅Onebot11)。
 
 ## 二、下载插件
 1. 在官方仓库或 Releases 页面下载最新版本的 NeoBot 插件 JAR（例如：NeoBot-V3.jar）。
@@ -57,12 +57,12 @@
 
 ## 六、常见问题
 - 插件无法加载：检查 Java 版本、服务端版本、插件兼容性。
-- 配置文件错误：检查 YAML 格式、语法错误。
+- 配置文件错误：检查 JSON 格式、语法错误。
 - 聊天平台对接失败：检查 Token 是否有效、平台限制。
 
 ## 七、支持与反馈
-- 官方文档：[NeoBot 官方文档](https://github.com/NeoBot-Team/NeoBot)
-- GitHub 仓库：[NeoBot-Team/NeoBot](https://github.com/NeoBot-Team/NeoBot)
-- 社区支持：[NeoBot 社区](https://github.com/NeoBot-Team/NeoBot/discussions)
+- 官方文档：[NeoBot 官方文档](https://github.com/NeoVoxelDev/NeoBot-Docs)
+- GitHub 仓库：[NeoVoxelDev/NeoBot](https://github.com/NeoVoxelDev/NeoBot)
+- 社区支持：[NeoBot 社区](https://github.com/NeoVoxelDev/NeoBot-Docs/discussions)
 
 ---
