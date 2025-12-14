@@ -16,8 +16,7 @@ This document explains the installation and basic configuration steps for the Ne
 
 ::: tip Friendly Tip
 You can download the latest version of the NeoBot plugin below:
-
-<DownloadEN />
+[NeoBot Releases](https://github.com/NeoVoxelDev/NeoBot/releases)
 :::
 
 ## Installation Steps
