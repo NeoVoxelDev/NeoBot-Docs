@@ -1,0 +1,6 @@
+.vscode
+package-lock.json
+.pnpm-store/
+.pnpm-lock.yaml
+/docs/.vitepress/cache
+/node_modules

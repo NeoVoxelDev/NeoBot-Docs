@@ -1,4 +1,5 @@
 # 配置 NeoBot 插件
+
 要使 NeoBot 正常运行，您需要在这里配置相应的平台对接信息。请按照以下步骤进行配置：
 
 1. 打开插件目录下的配置文件，通常为 `plugins/NeoBot/config.json`。
@@ -49,14 +50,14 @@
       "type": [
         "onebot11-ws"
       ],
-      //正向Websocket配置
+      //正向 Websocket 配置
       "onebot11-ws": {
         // 服务器地址
         "url": "ws://127.0.0.1:3001",
         // 访问令牌
         "access-token": ""
       },
-      // 反向Websocket配置
+      // 反向 Websocket 配置
       "onebot11-ws-reverse": {
         // 监听地址
         "address": "127.0.0.1",

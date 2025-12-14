@@ -1,6 +1,18 @@
 <template>
   <div>
-    <table>
+    <div v-if="isLoading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>加载下载链接中...</p>
+    </div>
+
+    <div v-else-if="list.length === 0" class="error-container">
+      <p>加载失败，请刷新页面重试</p>
+      <ul v-if="errors.length > 0">
+        <li v-for="(error, index) in errors" :key="index">{{ error }}</li>
+      </ul>
+    </div>
+
+    <table v-else>
       <thead>
         <tr>
           <th>渠道</th>
@@ -46,6 +58,8 @@ interface DownloadItem {
 }
 
 const list: Ref<DownloadItem[]> = ref([])
+const isLoading = ref(true)
+const errors: Ref<string[]> = ref([])
 
 const githubLatestRelease = async () => {
   const res = await fetch('https://api.github.com/repos/NeoVoxelDev/NeoBot/releases/latest')
@@ -144,6 +158,7 @@ onMounted(async () => {
     list.value.push(data)
   } catch (e) {
     console.error(e)
+    errors.value.push('加载 GitHub 发布版本失败')
   }
 
   try {
@@ -151,6 +166,7 @@ onMounted(async () => {
     list.value.push(data)
   } catch (e) {
     console.error(e)
+    errors.value.push('加载 GitHub 构建版本失败')
   }
 
   try {
@@ -158,6 +174,7 @@ onMounted(async () => {
     list.value.push(data)
   } catch (e) {
     console.error(e)
+    errors.value.push('加载 Gitee 发布版本失败')
   }
 
   /*try {
@@ -166,7 +183,43 @@ onMounted(async () => {
   } catch (e) {
     console.error(e)
   }*/
+
+  isLoading.value = false
 })
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  color: var(--vp-c-text-2);
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--vp-c-bg-soft);
+  border-top: 3px solid var(--vp-c-brand-1);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.error-container {
+  color: var(--vp-c-red-1);
+}
+</style>

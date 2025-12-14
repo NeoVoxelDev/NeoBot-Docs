@@ -21,15 +21,25 @@ export const zhSidebar: DefaultTheme.Sidebar = {
       text: '脚本市场',
       collapsed: false,
       items: [
-        { text: 'NeoVoxel官方扩展', link: `/config/scripts/NeoVoxel-Scripts` },
-        { text: '上传扩展', link: `/config/scripts/Upload-Scripts` },
+        { text: 'NeoVoxel官方扩展', link: `/config/scripts/neovoxel-scripts` },
+        { text: '上传扩展', link: `/config/scripts/upload-scripts` },
+        { text: 'NeoBot 社区脚本库', link: `/config/scripts/community-scripts/repo` },
       ]
     },
     {
       text: '脚本开发',
       collapsed: false,
       items: [
-        { text: '接口文件', link: `/config/scripts/NeoBot` },
+        { text: '接口文件', link: `/config/scripts/neobot` },
+      ]
+    },
+    {
+      text: '贡献',
+      collapsed: false,
+      items: [
+        { text: '文档贡献', link: `/contribution/contribution` },
+        { text: '编写规范', link: `/contribution/writing-guide-summary` },
+        { text: '待办事项', link: `/contribution/todos` },
       ]
     },
   ]

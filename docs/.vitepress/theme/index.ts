@@ -10,6 +10,9 @@ import TeamMembersEN from '../TeamMembers/VPTeamMembersEN.vue';
 import ArticleMetadata from './components/ArticleMetadata.vue';
 import DownloadCN from '../Download/DownloadCN.vue';
 import DownloadEN from '../Download/DownloadEN.vue';
+import VPCommunityScriptsCN from '../Scripts/VPCommunityScriptsCN.vue';
+import VPCommunityScriptsEN from '../Scripts/VPCommunityScriptsEN.vue';
+
 import mediumZoom from 'medium-zoom';
 import { onMounted, watch, nextTick } from 'vue';
 import { useRoute } from 'vitepress';
@@ -49,6 +52,8 @@ export default {
     app.component('ArticleMetadata', ArticleMetadata);
     app.component('DownloadCN', DownloadCN);
     app.component('DownloadEN', DownloadEN);
+    app.component('VPCommunityScriptsCN', VPCommunityScriptsCN);
+    app.component('VPCommunityScriptsEN', VPCommunityScriptsEN);
   },
   Layout: MyLayout
 }

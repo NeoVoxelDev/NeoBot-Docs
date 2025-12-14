@@ -3,9 +3,11 @@
 ::: warning 注意
 本章节内容为 NeoBot 脚本开发的接口文件说明，适用于有一定编程基础的用户。如您是初次使用 NeoBot，建议先阅读[快速开始](../../quick-started)。
 :::
+
 ::: tip 提示
 已注释大部分接口和方法的功能说明，方便开发者理解和使用。如有任何疑问或建议，欢迎加入[官方交流群](https://qm.qq.com/q/hRC6znrdPq)进行交流。
 :::
+
 ```ts
 // filepath: plugins/NeoBot/scripts/NeoBot.d.ts
 // 基础 QQ 事件接口
@@ -299,9 +301,9 @@ declare interface OfflinePlayer {
 declare interface ScriptManager {
   loadParser(parser: (arg: string) => string): void; // 加载解析器
   parse(content: string): string; // 解析内容
-  addJsMethod(name: string, method: (arg: any[]) => any): void; // 添加JS方法
+  addJsMethod(name: string, method: (arg: any[]) => any): void; // 添加 JS 方法
   hasJsMethod(name: string): boolean; // 检查方法是否存在
-  callJsMethod(name: string, args: any[]): any; // 调用JS方法
+  callJsMethod(name: string, args: any[]): any; // 调用 JS 方法
 }
 
 declare const scriptManager: ScriptManager; // 脚本管理器实例

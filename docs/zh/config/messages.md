@@ -1,4 +1,5 @@
 # 配置 NeoBot 语言文件
+
 要使 NeoBot 正确显示消息内容，您需要在这里配置相应的语言文件。请按照以下步骤进行配置：
 
 1. 打开插件目录下的配置文件，通常为 `plugins/NeoBot/messages.json`。

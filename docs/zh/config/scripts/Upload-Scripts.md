@@ -5,8 +5,8 @@
 禁止上传含有恶意代码或侵犯他人版权的脚本，否则可能导致民事或法律责任。
 :::
 ::: info 信息
-本页面收录 个人 脚本，您可以访问 [NeoBot 官方脚本库](https://github.com/NeoVoxelDev/NeoBotScriptsRepo) 提交issue来申请上传您的脚本！
+本页面收录社区脚本，您可以访问 [NeoBot 社区脚本库 GitHub 仓库](https://github.com/NeoVoxelDev/NeoBotScriptsRepo) 提交 issue 或 pull request 来申请上传您的脚本！
 :::
 ::: tip 提示
-上传优质的脚本我们将会给您脚本署名并在官方脚本库中推荐！
+上传优质的脚本我们将会给您脚本署名并在社区脚本库中推荐！
 :::
