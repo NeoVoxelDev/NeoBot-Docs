@@ -15,9 +15,8 @@
 2. 确认所下载版本与当前服务端兼容（Minecraft 与服务端 API 版本）。
 
 ::: tip 温馨提示
-你可以在下面下载最新版本的 NeoBot 插件：
-
-<DownloadCN />
+你可以在这里下载最新版本的 NeoBot 插件：
+[NeoBot Releases](https://github.com/NeoVoxelDev/NeoBot/releases)
 :::
 
 ## 三、安装步骤

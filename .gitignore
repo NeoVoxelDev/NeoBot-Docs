@@ -1,6 +1,18 @@
+# 编辑器配置
 .vscode
+
+# 包管理锁文件
 package-lock.json
-.pnpm-store/
 .pnpm-lock.yaml
-/docs/.vitepress/cache
+
+# pnpm 缓存目录
+.pnpm-store/
+
+# 依赖目录
 /node_modules
+
+# VitePress 构建产物
+/docs/.vitepress/dist
+
+# VitePress 缓存
+/docs/.vitepress/cache

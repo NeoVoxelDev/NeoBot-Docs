@@ -18,7 +18,7 @@ export const zhConfig: LocaleSpecificConfig<DefaultTheme.Config> = {
     lightModeSwitchTitle: "切换到浅色模式",
     darkModeSwitchTitle: "切换到深色模式",
     footer: {
-      message: '根据 <a href="https://github.com/NeoVoxelDev/NeoBot-Docs/blob/main/LICENSE">GNU General Public License v3.0</a> 发布。', 
+      message: '根据 <a href="https://github.com/NeoVoxelDev/NeoBot-Docs/blob/main/LICENSE">LGPL-3.0</a> 发布。', 
       copyright: `版权所有 © ${dayjs().format("YYYY")} <a href="https://github.com/NeoVoxelDev">NeoVoxel Team</a>`
     },
     outline: {

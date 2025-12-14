@@ -4,7 +4,7 @@
 
 ### NeoBot：连接 Minecraft 与多平台的桥梁
 
-[![License: GNU v3.0](https://img.shields.io/badge/License-GNU%20v3.0-blue?logo=gnu&logoColor=white)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![License: LGPL-3.0](https://img.shields.io/badge/License-LGPL--3.0-blue?logo=gnu&logoColor=white)](https://www.gnu.org/licenses/lgpl-3.0.html)
 [![Java](https://img.shields.io/badge/Java-17+-ED8B00?logo=java&logoColor=white)](https://www.oracle.com/java/)
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.12+-62B47A?logo=minecraft&logoColor=white)](https://www.minecraft.net/)
 </div>
@@ -13,7 +13,7 @@
 NeoBot 旨在为服务器管理员和玩家提供卓越的体验，实现游戏内外的无缝通信。
 
 **NeoBot 仓库**: [NeoVoxelDev/NeoBot](https://github.com/NeoVoxelDev/NeoBot)
-**NeoBot 文档**: [NeoBot 官方文档](https://neobot-docs.pages.dev/)
+**NeoBot 文档**: [NeoBot 官方文档](https://neobot-docs.netlify.app/)
 
 ### 🎯 核心功能
 - ✅ **多平台支持** - 支持 QQ、Discord、Telegram、Kook 等主流聊天平台
@@ -58,7 +58,7 @@ NeoBot 旨在为服务器管理员和玩家提供卓越的体验，实现游戏�
 5. **测试功能**
    - 检查插件是否正常加载，测试基础功能如消息发送等。
 
-详细安装指南请参考：[快速开始文档](https://neobot-docs.pages.dev/quick-started)
+详细安装指南请参考：[快速开始文档](https://neobot-docs.netlify.app/quick-started)
 
 ---
 
@@ -80,9 +80,9 @@ NeoBot 旨在为服务器管理员和玩家提供卓越的体验，实现游戏�
 
 ### 🗂️ 社区脚本库
 丰富的社区贡献脚本，可直接使用或作为开发参考：
-- [官方脚本集合](https://neobot-docs.pages.dev/config/scripts/neovoxel-scripts)
-- [社区脚本仓库](https://neobot-docs.pages.dev/config/scripts/community-scripts/repo)
-- [脚本上传指南](https://neobot-docs.pages.dev/config/scripts/upload-scripts)
+- [官方脚本集合](https://neobot-docs.netlify.app/config/scripts/neovoxel-scripts)
+- [社区脚本仓库](https://neobot-docs.netlify.app/config/scripts/community-scripts/repo)
+- [脚本上传指南](https://neobot-docs.netlify.app/config/scripts/upload-scripts)
 
 ### ⚙️ 灵活配置
 提供丰富的配置选项，满足不同服务器的个性化需求：
@@ -92,9 +92,9 @@ NeoBot 旨在为服务器管理员和玩家提供卓越的体验，实现游戏�
 
 ### 📄 完整文档
 提供详细的文档和 API 参考，帮助用户和开发者快速上手：
-- [用户指南](https://neobot-docs.pages.dev/)
-- [API 文档](https://neobot-docs.pages.dev/config/scripts/neobot)
-- [贡献指南](https://neobot-docs.pages.dev/contribution/contribution)
+- [用户指南](https://neobot-docs.netlify.app/)
+- [API 文档](https://neobot-docs.netlify.app/config/scripts/neobot)
+- [贡献指南](https://neobot-docs.netlify.app/contribution/contribution)
 
 ---
 
@@ -117,7 +117,7 @@ NeoBot 旨在为服务器管理员和玩家提供卓越的体验，实现游戏�
 
 ### **📄 许可证**
 
-本项目采用 **GNU General Public License v3.0** 许可证。详情请查看 [LICENSE](LICENSE) 文件。
+本项目采用 **LGPL-3.0 License** 许可证。详情请查看 [LICENSE](LICENSE) 文件。
 
 ---
 

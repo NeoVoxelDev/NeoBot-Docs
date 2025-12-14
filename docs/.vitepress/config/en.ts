@@ -18,7 +18,7 @@ export const enConfig: LocaleSpecificConfig<DefaultTheme.Config> = {
     lightModeSwitchTitle: 'Switch to light mode',
     darkModeSwitchTitle: 'Switch to dark mode',
     footer: {
-      message: 'Released under the <a href="https://github.com/vuejs/vitepress/blob/main/LICENSE">LGPL-3 License</a>.',
+      message: 'Released under the <a href="https://github.com/NeoVoxelDev/NeoBot-Docs/blob/main/LICENSE">LGPL-3.0 License</a>.',
       copyright: `Copyright © ${dayjs().format("YYYY")} <a href="https://github.com/NeoVoxelDev">NeoVoxel Team</a>`
     },
     outline: {
