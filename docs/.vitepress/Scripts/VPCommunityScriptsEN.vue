@@ -74,6 +74,21 @@ const downloadScript = (downloadUrl: string) => {
   window.open(downloadUrl, '_blank')
 }
 
+const downloadMirrorScript = (downloadUrl: string) => {
+  const mirrorUrl = `https://edgeone.gh-proxy.org/${downloadUrl}`
+  window.open(mirrorUrl, '_blank')
+}
+
+const hoveredScriptId = ref<string | null>(null)
+
+const showDropdown = (scriptId: string) => {
+  hoveredScriptId.value = scriptId
+}
+
+const hideDropdown = () => {
+  hoveredScriptId.value = null
+}
+
 const filteredScripts = computed(() => {
   if (!searchQuery.value.trim()) {
     return scripts.value
@@ -143,9 +158,17 @@ const filteredScripts = computed(() => {
           </div>
 
           <div class="script-actions">
-            <button @click="downloadScript(script.download)" class="download-button">
-              Download
-            </button>
+            <div class="download-container" @mouseenter="showDropdown(script.id)" @mouseleave="hideDropdown">
+              <transition name="slide">
+                <button v-if="hoveredScriptId === script.id" @click.stop="downloadMirrorScript(script.download)"
+                  class="mirror-download-button">
+                  Mirror
+                </button>
+              </transition>
+              <button @click="downloadScript(script.download)" class="download-button">
+                Download
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -325,6 +348,13 @@ const filteredScripts = computed(() => {
   justify-content: flex-end;
 }
 
+.download-container {
+  position: relative;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .download-button {
   padding: 0.5rem 1.25rem;
   background-color: var(--vp-c-brand-1);
@@ -335,10 +365,64 @@ const filteredScripts = computed(() => {
   font-weight: 500;
   font-size: 0.9rem;
   transition: background-color 0.3s ease, transform 0.2s ease;
+  z-index: 2;
 }
 
 .download-button:hover {
   background-color: var(--vp-c-brand-2);
   transform: translateY(-2px);
+}
+
+.mirror-download-button {
+  padding: 0.5rem 1.25rem;
+  background-color: var(--vp-c-bg-alt);
+  color: var(--vp-c-text-1);
+  border: 1px solid var(--vp-c-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.mirror-download-button:hover {
+  background-color: var(--vp-c-bg-soft);
+  border-color: var(--vp-c-brand-1);
+  transform: translateY(-2px);
+}
+
+/* 进入动画 - 从右向左滑入 */
+.slide-enter-active {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* 离开动画 - 从左向右滑出 */
+.slide-leave-active {
+  animation: slideOutLeft 0.3s ease-in;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(20px);
+  }
 }
 </style>
