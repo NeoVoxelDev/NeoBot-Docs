@@ -8,354 +8,702 @@
 已注释大部分接口和方法的功能说明，方便开发者理解和使用。如有任何疑问或建议，欢迎加入[官方交流群](https://qm.qq.com/q/hRC6znrdPq)进行交流。
 :::
 
-```ts
-// filepath: plugins/NeoBot/scripts/NeoBot.d.ts
-// 基础 QQ 事件接口
-declare interface QQEvent {
-  getSelfId(): number; // 获取机器人自身 ID
-  getTime(): number; // 获取事件发生时间戳
-}
 
-// 群消息事件接口
-declare interface GroupMessageEvent extends QQEvent {
-  getGroupId(): number; // 获取群号
-  getMessageId(): number; // 获取消息 ID
-  getSenderId(): number; // 获取发送者 QQ 号
-  getRawMessage(): string; // 获取原始消息内容
-  getJsonMessage(): string; // 获取 JSON 格式消息
-}
+## QQ 事件接口
 
-// 重复声明，建议删除或合并到上面的 GroupMessageEvent
-declare interface GroupMessageEvent extends QQEvent {
-  getMessageId(): number;
-  getSenderId(): number;
-  getRawMessage(): string;
-}
+<ApiInterfaceCN 
+  interface-name="QQEvent" 
+  interface-type="interface" 
+  description="基础 QQ 事件接口，定义了所有 QQ 事件的通用属性和方法"
+  :parameters="[
+    { name: 'getSelfId', type: '() => number', required: true, description: '获取机器人自身 ID' },
+    { name: 'getTime', type: '() => number', required: true, description: '获取事件发生时间戳' }
+  ]"
+  example="declare interface QQEvent {\n  getSelfId(): number;\n  getTime(): number;\n}"
+  example-description="定义了 QQ 事件的基础接口，包含获取机器人 ID 和事件时间戳的方法"
+/>
 
-// 好友添加事件
-declare interface FriendAddEvent extends QQEvent {
-  getUserId(): number; // 获取好友 QQ 号
-}
 
-// 群成员减少事件（成员离开/被踢）
-declare interface GroupDecreaseEvent extends QQEvent {
-  getUserId(): number; // 事件相关用户 ID
-  getOperatorId(): number; // 操作者 ID（如果是被踢）
-  getGroupId(): number; // 群号
-}
 
-// 群成员增加事件（新成员加入）
-declare interface GroupIncreaseEvent extends QQEvent {
-  getUserId(): number; // 新成员 ID
-  getOperatorId(): number; // 邀请者 ID（如果有）
-  getGroupId(): number; // 群号
-}
+<ApiInterfaceCN 
+  interface-name="GroupMessageEvent" 
+  interface-type="interface" 
+  description="群消息事件接口，继承自 QQEvent，用于处理群聊消息"
+  :parameters="[
+    { name: 'getGroupId', type: '() => number', required: true, description: '获取群组 ID' },
+    { name: 'getMessageId', type: '() => number', required: true, description: '获取消息 ID' },
+    { name: 'getSenderId', type: '() => number', required: true, description: '获取发送者 ID' },
+    { name: 'getRawMessage', type: '() => string', required: true, description: '获取原始消息内容' },
+    { name: 'getJsonMessage', type: '() => string', required: true, description: '获取 JSON 格式消息内容' }
+  ]"
+  example="qq.register(&quot;GroupMessageEvent&quot;, (event) => {\n  const jsonMessage = event.getJsonMessage()\n  const newMessage = scriptManager.callJsMethod(&quot;util.parseTextJsonMessage&quot;, jsonMessage)\n  console.log(&quot;群 &quot; + event.getGroupId() + &quot; 收到消息: &quot; + newMessage)\n})"
+  example-description="注册群消息事件监听器，解析消息内容并输出群号和消息"
+/>
 
-// 戳一戳事件
-declare interface PokeEvent extends QQEvent {
-  getUserId(): number; // 发送戳一戳的用户 ID
-  getGroupId(): number; // 群号（如果是群内戳一戳）
-  getTargetId(): number; // 被戳用户 ID
-}
 
-// 好友请求事件
-declare interface FriendRequestEvent extends QQEvent {
-  getUserId(): number; // 请求者 ID
-  getComment(): string; // 验证信息
-  getFlag(): string; // 请求标识，用于处理请求
-}
 
-// 群请求事件（加群请求）
-declare interface GroupRequestEvent extends QQEvent {
-  getUserId(): number; // 请求者 ID
-  getGroupId(): number; // 群号
-  getComment(): string; // 验证信息
-  getFlag(): string; // 请求标识，用于处理请求
-}
+<ApiInterfaceCN 
+  interface-name="FriendAddEvent" 
+  interface-type="interface" 
+  description="好友添加事件接口，用于处理好友添加请求"
+  :parameters="[
+    { name: 'getUserId', type: '() => number', required: true, description: '获取用户 ID' }
+  ]"
+  example="qq.register(&quot;FriendAddEvent&quot;, (event) => {\n  console.log(&quot;收到好友添加请求: &quot; + event.getUserId())\n})"
+  example-description="监听好友添加事件，输出添加好友的用户 ID"
+/>
 
-// 基础用户信息
-declare interface BasicInfo {
-  getUserId(): number; // 用户 ID
-  getNickname(): string; // 用户昵称
-}
 
-// 群成员详细信息
-declare interface GroupMemberInfo {
-  getGroupId(): number; // 群号
-  getUserId(): number; // 用户 ID
-  getNickname(): string; // 昵称
-  getCard(): string; // 群名片
-  getAge(): number; // 年龄
-  getArea(): string; // 地区
-  getJoinTime(): number; // 加群时间
-  getLastSentTime(): number; // 最后发言时间
-  getLevel(): string; // 等级
-  getTitle(): string; // 特殊头衔
-  getTitleExpireTime(): number; // 头衔过期时间
-  getCardChangeable(): boolean; // 名片是否可修改
-  getRole(): Object; // 群角色
-}
 
-// QQ 机器人核心功能接口
-declare interface QQ {
-  // 事件注册
-  register(eventName: string, callback: (arg: QQEvent) => void): void;
+<ApiInterfaceCN 
+  interface-name="GroupDecreaseEvent" 
+  interface-type="interface" 
+  description="群成员减少事件接口，用于处理成员退群或被踢"
+  :parameters="[
+    { name: 'getUserId', type: '() => number', required: true, description: '获取用户 ID' },
+    { name: 'getOperatorId', type: '() => number', required: true, description: '获取操作者 ID' },
+    { name: 'getGroupId', type: '() => number', required: true, description: '获取群组 ID' }
+  ]"
+  example="qq.register(&quot;GroupDecreaseEvent&quot;, (event) => {\n  console.log(&quot;用户 &quot; + event.getUserId() + &quot; 离开群 &quot; + event.getGroupId())\n})"
+  example-description="监听群成员减少事件，输出离开群的用户 ID 和群号"
+/>
 
-  // 消息发送
-  sendGroupMessage(groupId: number, message: string): void;
-  sendPrivateMessage(userId: number, message: string): void;
 
-  // 群管理
-  renameGroupMember(groupId: number, userId: number, newName: string): void;
-  muteGroupMember(groupId: number, userId: number, duration: number): void;
-  muteAllGroupMember(groupId: number): void;
-  unMuteAllGroupMember(groupId: number): void;
-  kickGroupMember(groupId: number, userId: number): void;
 
-  // 请求处理
-  approveGroupRequest(flag: string, type: string): void;
-  rejectGroupRequest(flag: string, type: string): void;
-  rejectFriendRequest(flag: string): void;
-  approveFriendRequest(flag: string): void;
+<ApiInterfaceCN 
+  interface-name="GroupIncreaseEvent" 
+  interface-type="interface" 
+  description="群成员增加事件接口，用于处理成员加群"
+  :parameters="[
+    { name: 'getUserId', type: '() => number', required: true, description: '获取用户 ID' },
+    { name: 'getOperatorId', type: '() => number', required: true, description: '获取操作者 ID' },
+    { name: 'getGroupId', type: '() => number', required: true, description: '获取群组 ID' }
+  ]"
+  example="qq.register(&quot;GroupIncreaseEvent&quot;, (event) => {\n  console.log(&quot;用户 &quot; + event.getUserId() + &quot; 加入群 &quot; + event.getGroupId())\n})"
+  example-description="监听群成员增加事件，输出加入群的用户 ID 和群号"
+/>
 
-  // 群成员信息获取
-  getGroupMemberList(
-    groupId: number,
-    callback: (arg: BasicInfo[]) => void,
-  ): void;
-  getGroupMemberInfo(
-    groupId: number,
-    userId: number,
-    callback: (arg: GroupMemberInfo) => void,
-  ): void;
-}
 
-declare const qq: QQ; // QQ 实例
 
-// 游戏相关事件接口
-declare interface LoginEvent {
-  getName(): string;
-  disallow(reason: string): void; // 阻止登录
-}
+<ApiInterfaceCN 
+  interface-name="PokeEvent" 
+  interface-type="interface" 
+  description="戳一戳事件接口，用于处理群内戳一戳互动"
+  :parameters="[
+    { name: 'getUserId', type: '() => number', required: true, description: '获取发起戳一戳的用户 ID' },
+    { name: 'getGroupId', type: '() => number', required: true, description: '获取群组 ID' },
+    { name: 'getTargetId', type: '() => number', required: true, description: '获取被戳的用户 ID' }
+  ]"
+  example="qq.register(&quot;PokeEvent&quot;, (event) => {\n  console.log(&quot;用户 &quot; + event.getUserId() + &quot; 戳了用户 &quot; + event.getTargetId())\n})"
+  example-description="监听戳一戳事件，输出发起者和被戳者的用户 ID"
+/>
 
-declare interface JoinEvent extends Player {} // 玩家加入事件
 
-declare interface QuitEvent extends Player {} // 玩家退出事件
 
-// 游戏聊天事件
-declare interface ChatEvent {
-  getPlayer(): Player; // 获取发言玩家
-  getMessage(): string; // 获取消息内容
-  disallow(): void; // 阻止消息发送
-}
+<ApiInterfaceCN 
+  interface-name="FriendRequestEvent" 
+  interface-type="interface" 
+  description="好友请求事件接口，用于处理好友添加请求"
+  :parameters="[
+    { name: 'getUserId', type: '() => number', required: true, description: '获取请求添加好友的用户 ID' },
+    { name: 'getComment', type: '() => string', required: true, description: '获取验证消息' },
+    { name: 'getFlag', type: '() => string', required: true, description: '获取请求标识，用于处理请求' }
+  ]"
+  example="qq.register(&quot;FriendRequestEvent&quot;, (event) => {\n  console.log(&quot;收到好友请求: &quot; + event.getUserId() + &quot;, 验证消息: &quot; + event.getComment())\n})"
+  example-description="监听好友请求事件，输出请求者 ID 和验证消息"
+/>
 
-// 玩家接口
-declare interface Player {
-  getName(): string; // 获取玩家名
-  sendMessage(message: string): void; // 向玩家发送消息
-  kick(message: string): void; // 踢出玩家
-}
 
-// 游戏事件系统
-declare interface Game {
-  register(eventName: string, callback: (arg: any[]) => void): void;
-}
 
-declare const gameEvent: Game; // 游戏事件实例
+<ApiInterfaceCN 
+  interface-name="GroupRequestEvent" 
+  interface-type="interface" 
+  description="群请求事件接口，用于处理加群请求"
+  :parameters="[
+    { name: 'getUserId', type: '() => number', required: true, description: '获取请求加群的用户 ID' },
+    { name: 'getGroupId', type: '() => number', required: true, description: '获取群组 ID' },
+    { name: 'getComment', type: '() => string', required: true, description: '获取验证消息' },
+    { name: 'getFlag', type: '() => string', required: true, description: '获取请求标识，用于处理请求' }
+  ]"
+  example="qq.register(&quot;GroupRequestEvent&quot;, (event) => {\n  console.log(&quot;收到加群请求: &quot; + event.getUserId() + &quot;, 群: &quot; + event.getGroupId() + &quot;, 验证消息: &quot; + event.getComment())\n})"
+  example-description="监听加群请求事件，输出请求者 ID、群号和验证消息"
+/>
 
-// 命令发送者接口
-declare interface CommandSender {
-  getName(): string;
-  sendMessage(message: string): void;
-  hasPermission(permission: string): boolean; // 检查权限
-}
+## 用户信息接口
 
-// 游戏命令系统
-declare interface GameCommand {
-  onCommand(callback: (sender: CommandSender, args: string[]) => void): void;
-}
+<ApiInterfaceCN 
+  interface-name="BasicInfo" 
+  interface-type="interface" 
+  description="基础信息接口，定义用户的基本信息"
+  :parameters="[
+    { name: 'getUserId', type: '() => number', required: true, description: '获取用户 ID' },
+    { name: 'getNickname', type: '() => string', required: true, description: '获取用户昵称' }
+  ]"
+  example="const userInfo: BasicInfo = {\n  getUserId: () => 123456789,\n  getNickname: () => &quot;测试用户&quot;\n}\nconsole.log(&quot;用户ID: &quot; + userInfo.getUserId() + &quot;, 昵称: &quot; + userInfo.getNickname())"
+  example-description="创建基础信息对象，获取用户 ID 和昵称"
+/>
 
-declare const gameCommand: GameCommand; // 游戏命令实例
 
-// 配置管理接口
-declare interface Config {
-  // 配置值获取
-  getString(node: string): string;
-  getDouble(node: string): number;
-  getInt(node: string): number;
-  getBoolean(node: string): boolean;
-  has(node: string): boolean;
 
-  // 配置操作
-  put(node: string, value: any): void; // 临时修改配置（不持久化）
-  getKeys(): string[]; // 获取所有配置键
-  getObject(node: string): Config; // 获取对象配置
-  getArray(node: string): Config[]; // 获取数组配置
-  getStringArray(node: string): string[]; // 获取字符串数组
-  getNumberArray(node: string): number[]; // 获取数字数组
-  getMessage(node: string): string; // 获取消息配置
+<ApiInterfaceCN 
+  interface-name="FriendInfo" 
+  interface-type="interface" 
+  description="好友信息接口，继承自 BasicInfo，扩展好友特有信息"
+  :parameters="[
+    { name: 'getUserId', type: '() => number', required: true, description: '获取用户 ID' },
+    { name: 'getNickname', type: '() => string', required: true, description: '获取用户昵称' },
+    { name: 'getRemark', type: '() => string', required: true, description: '获取好友备注' }
+  ]"
+  example="const friendInfo: FriendInfo = {\n  getUserId: () => 123456789,\n  getNickname: () => &quot;好友昵称&quot;,\n  getRemark: () => &quot;好友备注&quot;\n}\nconsole.log(&quot;好友备注: &quot; + friendInfo.getRemark())"
+  example-description="创建好友信息对象，获取好友备注信息"
+/>
 
-  // 配置选项管理
-  addOption(node: string, defaultValue: any): void;
-}
 
-// 配置实例
-declare const generalConfig: Config; // 通用配置
-declare const messageConfig: Config; // 消息配置
 
-// 日志接口
-declare interface Logger {
-  info(message: string): void; // 信息日志
-  warn(message: string): void; // 警告日志
-  error(message: string): void; // 错误日志
-  debug(message: string): void; // 调试日志
-  trace(message: string): void; // 跟踪日志
-}
+<ApiInterfaceCN 
+  interface-name="GroupInfo" 
+  interface-type="interface" 
+  description="群组信息接口，提供群组相关信息"
+  :parameters="[
+    { name: 'getGroupId', type: '() => number', required: true, description: '获取群组 ID' },
+    { name: 'getGroupName', type: '() => string', required: true, description: '获取群组名称' },
+    { name: 'getGroupMemberCount', type: '() => number', required: true, description: '获取群成员数量' },
+    { name: 'getGroupMaxMemberCount', type: '() => number', required: true, description: '获取群最大成员数量' }
+  ]"
+  example="qq.getGroupList((groups: GroupInfo[]) => {\n  for (const group of groups) {\n    console.log(&quot;群名: &quot; + group.getGroupName() + &quot;, 成员数: &quot; + group.getGroupMemberCount() + &quot;/&quot; + group.getGroupMaxMemberCount())\n  }\n})"
+  example-description="获取所有群组列表，并输出群名和成员数量"
+/>
 
-// 数据库表创建器
-declare interface DatabaseCreator {
-  column(name: string, type: string, extraOptions: string): DatabaseCreator;
-  execute(): void; // 执行创建
-}
 
-// 数据库行数据接口
-declare interface Row {
-  getString(column: string): string;
-  getInt(column: string): number;
-  getLong(column: string): number;
-  getFloat(column: string): number;
-  getDouble(column: string): number;
-  getBoolean(column: string): boolean;
-  getObject(column: string): any;
-  getObject<T>(column: string, type: T): T; // 泛型方式获取对象
-}
 
-// 查询结果接口
-declare interface Result {
-  map(): Row[]; // 获取所有行
-  getFirst(): Row; // 获取第一行
-  get(index: number): Row; // 获取指定行
-}
+<ApiInterfaceCN 
+  interface-name="GroupMemberInfo" 
+  interface-type="interface" 
+  description="群成员信息接口，提供群成员详细信息"
+  :parameters="[
+    { name: 'getGroupId', type: '() => number', required: true, description: '获取群组 ID' },
+    { name: 'getUserId', type: '() => number', required: true, description: '获取用户 ID' },
+    { name: 'getNickname', type: '() => string', required: true, description: '获取用户昵称' },
+    { name: 'getCard', type: '() => string', required: true, description: '获取群名片' },
+    { name: 'getAge', type: '() => number', required: true, description: '获取群龄（天数）' },
+    { name: 'getArea', type: '() => string', required: true, description: '获取地区' },
+    { name: 'getJoinTime', type: '() => number', required: true, description: '获取加群时间戳' },
+    { name: 'getLastSentTime', type: '() => number', required: true, description: '获取最后发言时间戳' },
+    { name: 'getLevel', type: '() => string', required: true, description: '获取等级' },
+    { name: 'getTitle', type: '() => string', required: true, description: '获取头衔' },
+    { name: 'getTitleExpireTime', type: '() => number', required: true, description: '获取头衔过期时间' },
+    { name: 'getCardChangeable', type: '() => boolean', required: true, description: '获取是否可修改群名片' },
+    { name: 'getRole', type: '() => Enum', required: true, description: '获取群角色' },
+    { name: 'getSex', type: '() => Enum', required: true, description: '获取性别' }
+  ]"
+  example="qq.getGroupMemberInfo(groupId, userId, (memberInfo: GroupMemberInfo) => {\n  const name = memberInfo.getCard() || memberInfo.getNickname()\n  const role = memberInfo.getRole().toString()\n  console.log(&quot;成员: &quot; + name + &quot;, 角色: &quot; + role)\n})"
+  example-description="获取群成员信息，优先使用群名片，否则使用昵称，并输出角色信息"
+/>
 
-// 数据库查询器
-declare interface DatabaseSelector {
-  all(): DatabaseSelector; // 选择所有列
-  column(column: string): DatabaseSelector; // 选择指定列
-  column(column: string[]): DatabaseSelector; // 选择多个列
-  where(column: string, value: any): DatabaseSelector; // 条件查询
-  where(column: string, operator: string, value: any): DatabaseSelector; // 带操作符的条件查询
-  execute(): Result; // 执行查询
-}
+## 游戏事件接口
 
-// 数据库更新器
-declare interface DatabaseUpdater {
-  set(column: string, value: any): DatabaseUpdater; // 设置更新值
-  where(column: string, value: any): DatabaseUpdater; // 更新条件
-  where(column: string, operator: string, value: any): DatabaseUpdater; // 带操作符的更新条件
-  execute(): void; // 执行更新
-}
+<ApiInterfaceCN 
+  interface-name="LoginEvent" 
+  interface-type="interface" 
+  description="登录事件接口，用于处理玩家登录事件"
+  :parameters="[
+    { name: 'getName', type: '() => string', required: true, description: '获取玩家名称' },
+    { name: 'disallow', type: '(reason: string): void', required: true, description: '拒绝玩家登录并显示原因' }
+  ]"
+  example="gameEvent.register(&quot;LoginEvent&quot;, (event: LoginEvent) => {\n  if (!isWhitelisted(event.getName())) {\n    event.disallow(&quot;您不在白名单中!&quot;)\n  }\n})"
+  example-description="监听玩家登录事件，检查白名单并拒绝非白名单玩家登录"
+/>
 
-// 数据库插入器
-declare interface DatabaseInserter {
-  column(column: string, value: any): DatabaseInserter; // 设置插入列和值
-  execute(): void; // 执行插入
-}
 
-// 数据库表结构修改器
-declare interface DatabaseModifier {
-  add(name: string, type: string): DatabaseModifier; // 添加列
-  add(name: string, type: string, extraOptions: string): DatabaseModifier; // 添加带选项的列
-  remove(name: string): DatabaseModifier; // 删除列
-  execute(): void; // 执行修改
-}
 
-// 数据库表操作接口
-declare interface DatabaseTable {
-  delete(): void; // 删除表
-  select(columns: string[]): DatabaseSelector; // 查询数据
-  create(): DatabaseCreator; // 创建表
-  update(): DatabaseUpdater; // 更新数据
-  insert(): DatabaseInserter; // 插入数据
-  alter(): DatabaseModifier; // 修改表结构
-}
+<ApiInterfaceCN 
+  interface-name="JoinEvent" 
+  interface-type="interface" 
+  description="玩家加入事件接口，用于处理玩家加入游戏事件"
+  :parameters="[
+    { name: 'getName', type: '() => string', required: true, description: '获取玩家名称' }
+  ]"
+  example="gameEvent.register(&quot;JoinEvent&quot;, (event: JoinEvent) => {\n  const message = messageConfig.getString(&quot;game-notice.on-join&quot;)\n    .replaceAll(&quot;${playerName}&quot;, event.getName())\n  for (const groupId of generalConfig.getNumberArray(&quot;bot.options.enable-groups&quot;)) {\n    scriptManager.callJsMethod(&quot;util.sendGroupTextMessage&quot;, groupId, message)\n  }\n})"
+  example-description="监听玩家加入事件，向配置的群发送加入通知"
+/>
 
-// 数据库存储接口
-declare interface DatabaseStorage {
-  table(name: string): DatabaseTable; // 获取表操作对象
-}
 
-// 在线玩家接口（扩展离线玩家）
-declare interface Player extends OfflinePlayer {
-  sendMessage(message: string): void;
-  hasPermission(permission: string): boolean;
-  kick(message: string): void;
-}
 
-// 离线玩家接口
-declare interface OfflinePlayer {
-  getName(): string; // 获取玩家名
-  isOnline(): boolean; // 检查是否在线
-}
+<ApiInterfaceCN 
+  interface-name="QuitEvent" 
+  interface-type="interface" 
+  description="玩家退出事件接口，用于处理玩家退出游戏事件"
+  :parameters="[
+    { name: 'getName', type: '() => string', required: true, description: '获取玩家名称' }
+  ]"
+  example="gameEvent.register(&quot;QuitEvent&quot;, (event: QuitEvent) => {\n  const message = messageConfig.getString(&quot;game-notice.on-quit&quot;)\n    .replaceAll(&quot;${playerName}&quot;, event.getName())\n  for (const groupId of generalConfig.getNumberArray(&quot;bot.options.enable-groups&quot;)) {\n    scriptManager.callJsMethod(&quot;util.sendGroupTextMessage&quot;, groupId, message)\n  }\n})"
+  example-description="监听玩家退出事件，向配置的群发送退出通知"
+/>
 
-// 脚本管理器接口
-declare interface ScriptManager {
-  loadParser(parser: (arg: string) => string): void; // 加载解析器
-  parse(content: string): string; // 解析内容
-  addJsMethod(name: string, method: (arg: any[]) => any): void; // 添加 JS 方法
-  hasJsMethod(name: string): boolean; // 检查方法是否存在
-  callJsMethod(name: string, args: any[]): any; // 调用 JS 方法
-}
 
-declare const scriptManager: ScriptManager; // 脚本管理器实例
 
-// 原生 Object 扩展（TypeScript 内置）
-declare interface Object {
-  toString(): string;
-}
+<ApiInterfaceCN 
+  interface-name="ChatEvent" 
+  interface-type="interface" 
+  description="聊天事件接口，用于处理游戏内聊天消息"
+  :parameters="[
+    { name: 'getPlayer', type: '() => Player', required: true, description: '获取发送消息的玩家对象' },
+    { name: 'getMessage', type: '() => string', required: true, description: '获取消息内容' },
+    { name: 'disallow', type: '(): void', required: true, description: '阻止消息发送' }
+  ]"
+  example="gameEvent.register(&quot;ChatEvent&quot;, (event: ChatEvent) => {\n  const name = event.getPlayer().getName()\n  let message = event.getMessage()\n  if (generalConfig.getBoolean(&quot;chat-forward.to-qq.format&quot;)) {\n    message = scriptManager.callJsMethod(&quot;util.gameToQQ&quot;, message)\n  }\n  const format = messageConfig.getString(&quot;chat-forward.to-qq&quot;)\n    .replaceAll(&quot;${playerName}&quot;, name)\n    .replaceAll(&quot;${message}&quot;, message)\n  for (const groupId of generalConfig.getNumberArray(&quot;bot.options.enable-groups&quot;)) {\n    scriptManager.callJsMethod(&quot;util.sendGroupTextMessage&quot;, groupId, format)\n  }\n})"
+  example-description="监听游戏聊天事件，将游戏内消息转发到 QQ 群"
+/>
 
-// 命令执行器接口
-declare interface Executor {
-  init(): boolean; // 初始化
-  execute(command: string): void; // 执行命令
-  getResult(): string; // 获取执行结果
-}
+## 游戏对象接口
 
-// 任务接口
-declare interface Task {
-  cancel(): void; // 取消任务
-}
+<ApiInterfaceCN 
+  interface-name="Player" 
+  interface-type="interface" 
+  description="玩家接口，提供玩家相关操作方法"
+  :parameters="[
+    { name: 'getName', type: '() => string', required: true, description: '获取玩家名称' },
+    { name: 'sendMessage', type: '(message: string): void', required: true, description: '向玩家发送消息' },
+    { name: 'kick', type: '(message: string): void', required: true, description: '踢出玩家' },
+    { name: 'hasPermission', type: '(permission: string): boolean', required: true, description: '检查玩家是否有权限' },
+    { name: 'isOnline', type: '() => boolean', required: true, description: '检查玩家是否在线' }
+  ]"
+  example="const player = plugin.getOnlinePlayer(&quot;Steve&quot;)\nif (player) {\n  player.sendMessage(&quot;欢迎来到服务器!&quot;)\n  if (player.hasPermission(&quot;admin.kick&quot;)) {\n    console.log(&quot;玩家有踢人权限&quot;)\n  }\n}"
+  example-description="获取在线玩家对象，发送消息并检查权限"
+/>
 
-// NeoBot 核心插件接口
-declare interface NeoBot {
-  // 基础功能
-  getNeoLogger(): Logger; // 获取日志器
-  getStorage(): DatabaseStorage; // 获取数据库存储
-  getStorageType(): string; // 获取存储类型
 
-  // 消息和玩家管理
-  broadcast(message: string): void; // 全服广播
-  getOnlinePlayers(): Player[]; // 获取在线玩家列表
-  getOnlinePlayer(name: string): Player; // 获取在线玩家
-  getOfflinePlayer(name: string): OfflinePlayer; // 获取离线玩家
 
-  // 功能扩展
-  parsePlaceholder(message: string, player: Player): string; // 解析占位符
-  isPluginLoaded(name: string): boolean; // 检查插件是否加载
-  getPlatform(): string; // 获取运行平台
+<ApiInterfaceCN 
+  interface-name="OfflinePlayer" 
+  interface-type="interface" 
+  description="离线玩家接口，提供离线玩家的基本信息"
+  :parameters="[
+    { name: 'getName', type: '() => string', required: true, description: '获取玩家名称' },
+    { name: 'isOnline', type: '() => boolean', required: true, description: '检查玩家是否在线' }
+  ]"
+  example="const offlinePlayer = plugin.getOfflinePlayer(&quot;Steve&quot;)\nconsole.log(&quot;玩家名称: &quot; + offlinePlayer.getName())\nconsole.log(&quot;是否在线: &quot; + offlinePlayer.isOnline())"
+  example-description="获取离线玩家对象并检查其名称和在线状态"
+/>
 
-  // 命令执行
-  getExecutorByName(name: string): Executor; // 获取命令执行器
 
-  // 任务调度
-  submit(task: () => void): Task; // 提交即时任务
-  submitAsync(task: () => void): Task; // 提交异步即时任务
-  submit(task: () => void, delay: number): Task; // 提交延迟任务
-  submitAsync(task: () => void, delay: number): Task; // 提交异步延迟任务
-  submit(task: () => void, delay: number, period: number): Task; // 提交定时任务
-  submitAsync(task: () => void, delay: number, period: number): Task; // 提交异步定时任务
-}
 
-declare const plugin: NeoBot; // NeoBot 插件实例
-```
+<ApiInterfaceCN 
+  interface-name="CommandSender" 
+  interface-type="interface" 
+  description="命令发送者接口，用于处理命令执行者"
+  :parameters="[
+    { name: 'getName', type: '() => string', required: true, description: '获取发送者名称' },
+    { name: 'sendMessage', type: '(message: string): void', required: true, description: '向发送者发送消息' },
+    { name: 'hasPermission', type: '(permission: string): boolean', required: true, description: '检查发送者是否有权限' }
+  ]"
+  example="gameCommand.onCommand((sender: CommandSender, args: string[]) => {\n  if (!sender.hasPermission(&quot;neobot.admin&quot;)) {\n    sender.sendMessage(&quot;您没有权限执行此命令!&quot;)\n    return\n  }\n  sender.sendMessage(&quot;命令执行成功!&quot;)\n})"
+  example-description="注册命令处理器，检查权限并发送消息"
+/>
 
-3. 保存并关闭配置文件。
+
+
+<ApiInterfaceCN 
+  interface-name="Game" 
+  interface-type="interface" 
+  description="游戏事件接口，用于注册游戏事件监听器"
+  :parameters="[
+    { name: 'register', type: '(eventName: string, callback: (arg: any[]) => void): void', required: true, description: '注册游戏事件监听器' }
+  ]"
+  example="gameEvent.register(&quot;JoinEvent&quot;, (event: JoinEvent) => {\n  console.log(&quot;玩家 &quot; + event.getName() + &quot; 加入了游戏&quot;)\n})"
+  example-description="注册游戏事件监听器，处理玩家加入事件"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="GameCommand" 
+  interface-type="interface" 
+  description="游戏命令接口，用于注册游戏命令处理器"
+  :parameters="[
+    { name: 'onCommand', type: '(callback: (sender: CommandSender, args: string[]) => void): void', required: true, description: '注册命令处理器' }
+  ]"
+  example="gameCommand.onCommand((sender: CommandSender, args: string[]) => {\n  sender.sendMessage(&quot;执行命令，参数: &quot; + args.join(&quot;, &quot;))\n})"
+  example-description="注册游戏命令处理器，处理命令执行"
+/>
+
+## 网络通信接口
+
+<ApiInterfaceCN 
+  interface-name="HttpResult" 
+  interface-type="interface" 
+  description="HTTP 请求结果接口，用于处理 HTTP 响应"
+  :parameters="[
+    { name: 'getStatusCode', type: '(): number', required: true, description: '获取 HTTP 状态码' },
+    { name: 'getResponseContent', type: '(): string', required: true, description: '获取响应内容' }
+  ]"
+  example="const request = http.builder(&quot;https://api.example.com/data&quot;).get()\nconst result = request.connect()\n\nif (result.getStatusCode() === 200) {\n  console.log(&quot;请求成功:&quot;, result.getResponseContent())\n} else {\n  console.log(&quot;请求失败，状态码:&quot;, result.getStatusCode())\n}"
+  example-description="发送 HTTP 请求并处理响应结果"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="HttpRequest" 
+  interface-type="interface" 
+  description="HTTP 请求接口，用于配置和发送 HTTP 请求"
+  :parameters="[
+    { name: 'timeout', type: '(timeout: number): HttpRequest', required: true, description: '设置超时时间（毫秒）' },
+    { name: 'connectTimeout', type: '(timeout: number): HttpRequest', required: true, description: '设置连接超时时间（毫秒）' },
+    { name: 'readTimeout', type: '(timeout: number): HttpRequest', required: true, description: '设置读取超时时间（毫秒）' },
+    { name: 'header', type: '(name: string, value: string): HttpRequest', required: true, description: '添加请求头' },
+    { name: 'connect', type: '(): HttpResult', required: true, description: '发送请求并获取结果' }
+  ]"
+  example="const request = http.builder(&quot;https://api.example.com/data&quot;)\n  .get()\n  .timeout(5000)\n  .header(&quot;Content-Type&quot;, &quot;application/json&quot;)\n  .header(&quot;Authorization&quot;, &quot;Bearer token123&quot;)\n  \nconst result = request.connect()"
+  example-description="配置 HTTP 请求参数并发送请求"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="HttpBuilder" 
+  interface-type="interface" 
+  description="HTTP 构建器接口，用于创建 HTTP 请求"
+  :parameters="[
+    { name: 'get', type: '(): HttpRequest', required: true, description: '创建 GET 请求' },
+    { name: 'post', type: '(): HttpRequest', required: true, description: '创建 POST 请求' },
+    { name: 'put', type: '(): HttpRequest', required: true, description: '创建 PUT 请求' },
+    { name: 'delete', type: '(): HttpRequest', required: true, description: '创建 DELETE 请求' }
+  ]"
+  example="// GET 请求\nconst getRequest = http.builder(&quot;https://api.example.com/data&quot;).get()\n\n// POST 请求\nconst postRequest = http.builder(&quot;https://api.example.com/data&quot;).post()\n\n// PUT 请求\nconst putRequest = http.builder(&quot;https://api.example.com/data/1&quot;).put()\n\n// DELETE 请求\nconst deleteRequest = http.builder(&quot;https://api.example.com/data/1&quot;).delete()"
+  example-description="创建不同类型的 HTTP 请求"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="Http" 
+  interface-type="interface" 
+  description="HTTP 接口，用于创建 HTTP 请求构建器"
+  :parameters="[
+    { name: 'builder', type: '(url: string): HttpBuilder', required: true, description: '创建指定 URL 的 HTTP 请求构建器' }
+  ]"
+  example="const request = http.builder(&quot;https://api.example.com/data&quot;)\nconst getRequest = request.get()\nconst result = getRequest.connect()"
+  example-description="创建 HTTP 请求构建器并发送请求"
+/>
+
+## 数据存储接口
+
+<ApiInterfaceCN 
+  interface-name="DatabaseCreator" 
+  interface-type="interface" 
+  description="数据库创建接口，用于创建数据库表"
+  :parameters="[
+    { name: 'column', type: '(name: string, type: string, extraOptions: string): DatabaseCreator', required: true, description: '添加列定义' },
+    { name: 'execute', type: '(): void', required: true, description: '执行表创建操作' }
+  ]"
+  example="const table = plugin.getStorageProvider().getStorage().table(&quot;neobot_whitelist&quot;)\ntable.create()\n  .column(&quot;qq&quot;, &quot;BIGINT&quot;, &quot;PRIMARY KEY&quot;)\n  .column(&quot;players&quot;, &quot;TEXT&quot;, &quot;NOT NULL&quot;)\n  .execute()"
+  example-description="创建数据库表，定义列结构并执行创建"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="Row" 
+  interface-type="interface" 
+  description="数据库行接口，用于访问查询结果中的单行数据"
+  :parameters="[
+    { name: 'getString', type: '(column: string): string', required: true, description: '获取字符串类型列值' },
+    { name: 'getInt', type: '(column: string): number', required: true, description: '获取整数类型列值' },
+    { name: 'getLong', type: '(column: string): number', required: true, description: '获取长整数类型列值' },
+    { name: 'getFloat', type: '(column: string): number', required: true, description: '获取浮点数类型列值' },
+    { name: 'getDouble', type: '(column: string): number', required: true, description: '获取双精度浮点数类型列值' },
+    { name: 'getBoolean', type: '(column: string): boolean', required: true, description: '获取布尔类型列值' },
+    { name: 'getObject', type: '(column: string): any', required: true, description: '获取对象类型列值' },
+    { name: 'getObject', type: '(column: string, type: T): T', required: true, description: '获取指定类型的列值' }
+  ]"
+  example="const result = table.select([&quot;players&quot;, &quot;qq&quot;]).execute()\nfor (const row of result.map()) {\n  const qq = row.getLong(&quot;qq&quot;)\n  const players = JSON.parse(row.getString(&quot;players&quot;))\n  console.log(&quot;QQ: &quot; + qq + &quot;, 绑定玩家: &quot; + players.join(&quot;, &quot;))\n}"
+  example-description="遍历查询结果，获取行数据并解析"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="Result" 
+  interface-type="interface" 
+  description="数据库查询结果接口，用于处理查询结果"
+  :parameters="[
+    { name: 'map', type: '(): Row[]', required: true, description: '将结果转换为行数组' },
+    { name: 'getFirst', type: '(): Row', required: true, description: '获取第一行数据' },
+    { name: 'get', type: '(index: number): Row', required: true, description: '获取指定索引的行数据' }
+  ]"
+  example="const result = table.select([&quot;players&quot;]).where(&quot;qq&quot;, userId).execute()\nif (result.map().length > 0) {\n  const firstRow = result.getFirst()\n  const players = JSON.parse(firstRow.getString(&quot;players&quot;))\n  console.log(&quot;绑定的玩家: &quot; + players.join(&quot;, &quot;))\n}"
+  example-description="执行查询并处理结果，获取第一行数据"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="DatabaseSelector" 
+  interface-type="interface" 
+  description="数据库查询接口，用于构建和执行查询"
+  :parameters="[
+    { name: 'all', type: '(): DatabaseSelector', required: true, description: '查询所有列' },
+    { name: 'column', type: '(column: string): DatabaseSelector', required: true, description: '指定查询列' },
+    { name: 'column', type: '(column: string[]): DatabaseSelector', required: true, description: '指定多个查询列' },
+    { name: 'where', type: '(column: string, value: any): DatabaseSelector', required: true, description: '添加等值条件' },
+    { name: 'where', type: '(column: string, operator: string, value: any): DatabaseSelector', required: true, description: '添加条件' },
+    { name: 'execute', type: '(): Result', required: true, description: '执行查询' }
+  ]"
+  example="const result = table.select([&quot;players&quot;, &quot;qq&quot;])\n  .where(&quot;qq&quot;, userId)\n  .execute()\n  \nconst rows = table.select()\n  .where(&quot;time&quot;, &quot;&gt;&quot;, Date.now() - 86400000)\n  .execute().map()"
+  example-description="构建查询条件，执行查询并获取结果"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="DatabaseUpdater" 
+  interface-type="interface" 
+  description="数据库更新接口，用于更新数据"
+  :parameters="[
+    { name: 'set', type: '(column: string, value: any): DatabaseUpdater', required: true, description: '设置更新列和值' },
+    { name: 'where', type: '(column: string, value: any): DatabaseUpdater', required: true, description: '添加等值条件' },
+    { name: 'where', type: '(column: string, operator: string, value: any): DatabaseUpdater', required: true, description: '添加条件' },
+    { name: 'execute', type: '(): void', required: true, description: '执行更新' }
+  ]"
+  example="table.update()\n  .set(&quot;players&quot;, JSON.stringify(playerData))\n  .where(&quot;qq&quot;, userId)\n  .execute()\n  \ntable.update()\n  .set(&quot;time&quot;, Date.now())\n  .set(&quot;note&quot;, code)\n  .where(&quot;action&quot;, &quot;ACQUIRE_VERIFY&quot;)\n  .where(&quot;player&quot;, playerName)\n  .execute()"
+  example-description="构建更新操作，设置更新值和条件，执行更新"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="DatabaseInserter" 
+  interface-type="interface" 
+  description="数据库插入接口，用于插入数据"
+  :parameters="[
+    { name: 'column', type: '(column: string, value: any): DatabaseInserter', required: true, description: '添加列和值' },
+    { name: 'execute', type: '(): void', required: true, description: '执行插入' }
+  ]"
+  example="table.insert()\n  .column(&quot;qq&quot;, qqId)\n  .column(&quot;players&quot;, JSON.stringify(playerData))\n  .execute()\n  \nlogTable.insert()\n  .column(&quot;time&quot;, Date.now())\n  .column(&quot;operator&quot;, qqId)\n  .column(&quot;target&quot;, qqId)\n  .column(&quot;player&quot;, playerName)\n  .column(&quot;action&quot;, &quot;BIND&quot;)\n  .column(&quot;note&quot;, &quot;NONE&quot;)\n  .execute()"
+  example-description="构建插入操作，添加列和值，执行插入"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="DatabaseModifier" 
+  interface-type="interface" 
+  description="数据库修改接口，用于修改表结构"
+  :parameters="[
+    { name: 'add', type: '(name: string, type: string): DatabaseModifier', required: true, description: '添加列' },
+    { name: 'add', type: '(name: string, type: string, extraOptions: string): DatabaseModifier', required: true, description: '添加带选项的列' },
+    { name: 'remove', type: '(name: string): DatabaseModifier', required: true, description: '删除列' },
+    { name: 'execute', type: '(): void', required: true, description: '执行修改' }
+  ]"
+  example="table.alter()\n  .add(&quot;new_column&quot;, &quot;VARCHAR(255)&quot;)\n  .add(&quot;another_column&quot;, &quot;INT&quot;, &quot;NOT NULL DEFAULT 0&quot;)\n  .remove(&quot;old_column&quot;)\n  .execute()"
+  example-description="修改表结构，添加和删除列"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="DatabaseDeleter" 
+  interface-type="interface" 
+  description="数据库删除接口，用于删除数据"
+  :parameters="[
+    { name: 'where', type: '(column: string, value: any): DatabaseDeleter', required: true, description: '添加等值条件' },
+    { name: 'where', type: '(column: string, operator: string, value: any): DatabaseDeleter', required: true, description: '添加条件' },
+    { name: 'execute', type: '(): void', required: true, description: '执行删除' }
+  ]"
+  example="table.delete()\n  .where(&quot;qq&quot;, userId)\n  .execute()\n  \nlogTable.delete()\n  .where(&quot;time&quot;, &quot;&lt;&quot;, Date.now() - 604800000)\n  .execute()"
+  example-description="构建删除操作，添加条件，执行删除"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="DatabaseTable" 
+  interface-type="interface" 
+  description="数据库表接口，提供表操作方法"
+  :parameters="[
+    { name: 'drop', type: '(): void', required: true, description: '删除表' },
+    { name: 'delete', type: '(): DatabaseDeleter', required: true, description: '创建删除操作' },
+    { name: 'select', type: '(columns: string[]): DatabaseSelector', required: true, description: '创建查询操作' },
+    { name: 'create', type: '(): DatabaseCreator', required: true, description: '创建表操作' },
+    { name: 'update', type: '(): DatabaseUpdater', required: true, description: '创建更新操作' },
+    { name: 'insert', type: '(): DatabaseInserter', required: true, description: '创建插入操作' },
+    { name: 'alter', type: '(): DatabaseModifier', required: true, description: '创建修改表结构操作' }
+  ]"
+  example="const table = storage.table(&quot;my_table&quot;)\n\n// 创建表\ntable.create()\n  .column(&quot;id&quot;, &quot;INT&quot;, &quot;PRIMARY KEY AUTO_INCREMENT&quot;)\n  .column(&quot;name&quot;, &quot;VARCHAR(255)&quot;, &quot;NOT NULL&quot;)\n  .execute()\n  \n// 插入数据\ntable.insert()\n  .column(&quot;name&quot;, &quot;测试&quot;)\n  .execute()\n  \n// 查询数据\nconst result = table.select([&quot;id&quot;, &quot;name&quot;])\n  .where(&quot;name&quot;, &quot;测试&quot;)\n  .execute()"
+  example-description="获取表对象并执行各种表操作"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="DatabaseStorage" 
+  interface-type="interface" 
+  description="数据库存储接口，用于获取表对象"
+  :parameters="[
+    { name: 'table', type: '(name: string): DatabaseTable', required: true, description: '获取指定名称的表对象' }
+  ]"
+  example="const storage = plugin.getStorageProvider().getStorage()\nconst table = storage.table(&quot;neobot_whitelist&quot;)\nconst logTable = storage.table(&quot;neobot_whitelist_logs&quot;)"
+  example-description="获取数据库存储对象并访问表"
+/>
+
+## 系统工具接口
+
+<ApiInterfaceCN 
+  interface-name="QQ" 
+  interface-type="interface" 
+  description="QQ 接口，提供 QQ 机器人相关操作方法"
+  :parameters="[
+    { name: 'register', type: '(eventName: string, callback: (arg: QQEvent) => void): void', required: true, description: '注册事件监听器' },
+    { name: 'sendGroupMessage', type: '(groupId: number, message: string): void', required: true, description: '发送群消息' },
+    { name: 'sendPrivateMessage', type: '(userId: number, message: string): void', required: true, description: '发送私聊消息' },
+    { name: 'renameGroupMember', type: '(groupId: number, userId: number, newName: string): void', required: true, description: '修改群成员群名片' },
+    { name: 'muteGroupMember', type: '(groupId: number, userId: number, duration: number): void', required: true, description: '禁言群成员' },
+    { name: 'muteAllGroupMember', type: '(groupId: number): void', required: true, description: '开启全员禁言' },
+    { name: 'unMuteAllGroupMember', type: '(groupId: number): void', required: true, description: '关闭全员禁言' },
+    { name: 'kickGroupMember', type: '(groupId: number, userId: number): void', required: true, description: '踢出群成员' },
+    { name: 'approveGroupRequest', type: '(flag: string, type: string): void', required: true, description: '同意群请求' },
+    { name: 'rejectGroupRequest', type: '(flag: string, type: string): void', required: true, description: '拒绝群请求' },
+    { name: 'rejectFriendRequest', type: '(flag: string): void', required: true, description: '拒绝好友请求' },
+    { name: 'approveFriendRequest', type: '(flag: string): void', required: true, description: '同意好友请求' },
+    { name: 'setGroupSpecialTitle', type: '(groupId: number, userId: number, title: string, duration: number): void', required: true, description: '设置群成员专属头衔' },
+    { name: 'setGroupWholeBan', type: '(groupId: number, enable: boolean): void', required: true, description: '设置全员禁言状态' },
+    { name: 'recallMessage', type: '(messageId: number): void', required: true, description: '撤回消息' },
+    { name: 'getGroupMemberList', type: '(groupId: number, callback: (arg: BasicInfo[]) => void): void', required: true, description: '获取群成员列表' },
+    { name: 'getGroupMemberInfo', type: '(groupId: number, userId: number, callback: (arg: GroupMemberInfo) => void): void', required: true, description: '获取群成员信息' },
+    { name: 'getGroupList', type: '(callback: (arg: GroupInfo[]) => void): void', required: true, description: '获取群列表' },
+    { name: 'getFriendList', type: '(callback: (arg: FriendInfo[]) => void): void', required: true, description: '获取好友列表' },
+    { name: 'getGroupInfo', type: '(groupId: number, callback: (arg: GroupInfo) => void): void', required: true, description: '获取群信息' }
+  ]"
+  example="qq.sendGroupMessage(123456789, &quot;Hello NeoBot!&quot;)\n\nqq.getGroupMemberInfo(123456789, 987654321, (memberInfo) => {\n  console.log(&quot;成员昵称: &quot; + memberInfo.getNickname())\n})"
+  example-description="发送群消息并获取群成员信息"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="Config" 
+  interface-type="interface" 
+  description="配置接口，用于读取和写入配置文件"
+  :parameters="[
+    { name: 'getString', type: '(node: string): string', required: true, description: '获取字符串配置值' },
+    { name: 'getDouble', type: '(node: string): number', required: true, description: '获取双精度浮点数配置值' },
+    { name: 'getInt', type: '(node: string): number', required: true, description: '获取整数配置值' },
+    { name: 'getBoolean', type: '(node: string): boolean', required: true, description: '获取布尔值配置值' },
+    { name: 'has', type: '(node: string): boolean', required: true, description: '检查配置节点是否存在' },
+    { name: 'put', type: '(node: string, value: any): void', required: true, description: '设置配置值（不持久化）' },
+    { name: 'getKeys', type: '(): string[]', required: true, description: '获取所有配置节点键' },
+    { name: 'getObject', type: '(node: string): Config', required: true, description: '获取配置对象' },
+    { name: 'getArray', type: '(node: string): Config[]', required: true, description: '获取配置数组' },
+    { name: 'getStringArray', type: '(node: string): string[]', required: true, description: '获取字符串数组配置值' },
+    { name: 'getNumberArray', type: '(node: string): number[]', required: true, description: '获取数字数组配置值' },
+    { name: 'getMessage', type: '(node: string): string', required: true, description: '获取消息配置值' },
+    { name: 'addOption', type: '(node: string, defaultValue: any): void', required: true, description: '添加配置选项' }
+  ]"
+  example="messageConfig.addOption(&quot;game-notice.on-join&quot;, &quot;[NeoBot] ${playerName} 加入了游戏!&quot;)\n\nconst enable = generalConfig.getBoolean(&quot;whitelist.enable&quot;)\nconst prefixes = generalConfig.getStringArray(&quot;whitelist.prefix.bind&quot;)\nconst maxBindCount = generalConfig.getInt(&quot;whitelist.max-bind-count&quot;)"
+  example-description="添加配置选项并读取各种类型的配置值"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="Logger" 
+  interface-type="interface" 
+  description="日志接口，用于记录日志信息"
+  :parameters="[
+    { name: 'info', type: '(message: string): void', required: true, description: '记录信息级别日志' },
+    { name: 'warn', type: '(message: string): void', required: true, description: '记录警告级别日志' },
+    { name: 'error', type: '(message: string): void', required: true, description: '记录错误级别日志' },
+    { name: 'debug', type: '(message: string): void', required: true, description: '记录调试级别日志' },
+    { name: 'trace', type: '(message: string): void', required: true, description: '记录跟踪级别日志' }
+  ]"
+  example="const logger = plugin.getNeoLogger()\nlogger.info(&quot;插件已加载&quot;)\nlogger.warn(&quot;这是一个警告&quot;)\nlogger.error(&quot;发生错误&quot;)"
+  example-description="获取日志记录器并记录不同级别的日志"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="ScriptManager" 
+  interface-type="interface" 
+  description="脚本管理器接口，用于管理脚本和方法"
+  :parameters="[
+    { name: 'loadParser', type: '(parser: (arg: string) => string): void', required: true, description: '加载解析器' },
+    { name: 'parse', type: '(content: string): string', required: true, description: '解析内容' },
+    { name: 'addJsMethod', type: '(name: string, method: (arg: any[]) => any): void', required: true, description: '添加 JavaScript 方法' },
+    { name: 'hasJsMethod', type: '(name: string): boolean', required: true, description: '检查 JavaScript 方法是否存在' },
+    { name: 'callJsMethod', type: '(name: string, ...args: any[]): any', required: true, description: '调用 JavaScript 方法' }
+  ]"
+  example="scriptManager.addJsMethod(&quot;util.configToGame&quot;, (content) => {\n  return content.replaceAll(&quot;&amp;&quot;, &quot;§&quot;)\n})\n\nscriptManager.addJsMethod(&quot;util.sendGroupTextMessage&quot;, (groupId, message) => {\n  const json = [{\n    &quot;type&quot;: &quot;text&quot;,\n    &quot;data&quot;: { &quot;text&quot;: message }\n  }]\n  qq.sendGroupMessage(groupId, JSON.stringify(json))\n})\n\nif (scriptManager.hasJsMethod(&quot;util.parseTextJsonMessage&quot;)) {\n  const parsed = scriptManager.callJsMethod(&quot;util.parseTextJsonMessage&quot;, jsonMessage)\n}"
+  example-description="添加 JavaScript 方法，检查方法是否存在，调用方法"
+/>
+
+
+<ApiInterfaceCN 
+  interface-name="StorageProvider" 
+  interface-type="interface" 
+  description="存储提供者接口，用于获取数据库存储"
+  :parameters="[
+    { name: 'getStorage', type: '(): DatabaseStorage', required: true, description: '获取数据库存储对象' },
+    { name: 'getStorageType', type: '(): string', required: true, description: '获取存储类型' }
+  ]"
+  example="const storageProvider = plugin.getStorageProvider()\nconst storage = storageProvider.getStorage()\nconst storageType = storageProvider.getStorageType()\nconsole.log(&quot;存储类型: &quot; + storageType)"
+  example-description="获取存储提供者并访问数据库存储"
+/>
+
+
+<ApiInterfaceCN 
+  interface-name="Scheduler" 
+  interface-type="interface" 
+  description="调度器接口，用于执行计划任务"
+  :parameters="[
+    { name: 'submit', type: '(task: () => void): void', required: true, description: '提交同步任务' },
+    { name: 'submitAsync', type: '(task: () => void): void', required: true, description: '提交异步任务' },
+    { name: 'submit', type: '(task: () => void, delay: number): void', required: true, description: '提交延迟任务' },
+    { name: 'submitAsync', type: '(task: () => void, delay: number): void', required: true, description: '提交延迟异步任务' },
+    { name: 'submit', type: '(task: () => void, delay: number, period: number): void', required: true, description: '提交延迟周期任务' },
+    { name: 'submitAsync', type: '(task: () => void, delay: number, period: number): void', required: true, description: '提交延迟周期异步任务' },
+    { name: 'submit', type: '(scriptName: string, functionName: string, delay: number): void', required: true, description: '提交脚本延迟任务' },
+    { name: 'submitAsync', type: '(scriptName: string, functionName: string, delay: number): void', required: true, description: '提交脚本延迟异步任务' },
+    { name: 'submit', type: '(scriptName: string, functionName: string, delay: number, period: number): void', required: true, description: '提交脚本延迟周期任务' },
+    { name: 'submitAsync', type: '(scriptName: string, functionName: string, delay: number, period: number): void', required: true, description: '提交脚本延迟周期异步任务' }
+  ]"
+  example="plugin.getScriptScheduler().submit(() => {\n  console.log(&quot;执行同步任务&quot;)\n})\n\nplugin.getScriptScheduler().submitAsync(() => {\n  console.log(&quot;执行异步任务&quot;)\n})\n\nplugin.getScriptScheduler().submit(() => {\n  console.log(&quot;5秒后执行的任务&quot;)\n}, 5000)\n\nplugin.getScriptScheduler().submit(() => {\n  console.log(&quot;每10秒执行一次的任务&quot;)\n}, 1000, 10000)"
+  example-description="使用调度器执行各种类型的任务"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="NeoBot" 
+  interface-type="interface" 
+  description="NeoBot 主接口，提供核心功能"
+  :parameters="[
+    { name: 'getNeoLogger', type: '(): Logger', required: true, description: '获取日志记录器' },
+    { name: 'getStorageProvider', type: '(): StorageProvider', required: true, description: '获取存储提供者' },
+    { name: 'getScriptScheduler', type: '(): Scheduler', required: true, description: '获取脚本调度器' },
+    { name: 'broadcast', type: '(message: string): void', required: true, description: '广播消息到所有玩家' },
+    { name: 'getOnlinePlayers', type: '(): Player[]', required: true, description: '获取所有在线玩家' },
+    { name: 'getOnlinePlayer', type: '(name: string): Player', required: true, description: '获取指定名称的在线玩家' },
+    { name: 'getOfflinePlayer', type: '(name: string): OfflinePlayer', required: true, description: '获取指定名称的离线玩家' },
+    { name: 'parsePlaceholder', type: '(message: string, player: Player): string', required: true, description: '解析占位符' },
+    { name: 'getPlatform', type: '(): string', required: true, description: '获取平台信息' }
+  ]"
+  example="const logger = plugin.getNeoLogger()\nconst storage = plugin.getStorageProvider().getStorage()\nconst scheduler = plugin.getScriptScheduler()\n\nplugin.broadcast(&quot;服务器公告: 欢迎来到服务器!&quot;)\n\nconst players = plugin.getOnlinePlayers()\nconsole.log(&quot;当前在线玩家数: &quot; + players.length)\n\nconst player = plugin.getOnlinePlayer(&quot;Steve&quot;)\nif (player) {\n  const message = plugin.parsePlaceholder(&quot;欢迎 ${player_name} 回到服务器!&quot;, player)\n  player.sendMessage(message)\n}"
+  example-description="使用 NeoBot 主接口的各种功能"
+/>
+
+
+
+<ApiInterfaceCN 
+  interface-name="Enum" 
+  interface-type="interface" 
+  description="枚举接口，提供枚举类型的基本方法"
+  :parameters="[
+    { name: 'toString', type: '() => string', required: true, description: '将枚举值转换为字符串' }
+  ]"
+  example="const role = memberInfo.getRole()\nconsole.log(&quot;成员角色: &quot; + role.toString())"
+  example-description="获取群成员角色并转换为字符串输出"
+/>
+
+
