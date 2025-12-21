@@ -14,7 +14,7 @@
     </div>
 
     <transition name="expand">
-      <div class="interface-content" v-if="isExpanded">
+      <div class="interface-content" v-show="isExpanded">
         <div class="interface-description" v-if="description">
           <p>{{ description }}</p>
         </div>
@@ -419,20 +419,34 @@ const copyToClipboard = async (text: string) => {
 }
 
 /* 展开动画 */
-.expand-enter-active,
-.expand-leave-active {
-  transition: all 0.3s ease;
+.expand-enter-active {
+  transition: max-height 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
   overflow: hidden;
 }
 
-.expand-enter-from,
-.expand-leave-to {
+.expand-leave-active {
+  transition: max-height 0.15s ease-in-out, opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+  overflow: hidden;
+}
+
+.expand-enter-from {
   max-height: 0;
   opacity: 0;
   transform: translateY(-10px);
 }
 
-.expand-enter-to,
+.expand-leave-to {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-3px);
+}
+
+.expand-enter-to {
+  max-height: 1000px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .expand-leave-from {
   max-height: 1000px;
   opacity: 1;

@@ -14,7 +14,7 @@
     </div>
 
     <transition name="expand">
-      <div class="interface-content" v-if="isExpanded">
+      <div class="interface-content" v-show="isExpanded">
         <div class="interface-description" v-if="description">
           <p>{{ description }}</p>
         </div>
@@ -46,8 +46,14 @@
           <div class="example-description" v-if="exampleDescription">
             {{ exampleDescription }}
           </div>
-          <div class="code-block">
-            <pre><code>{{ formattedExample }}</code></pre>
+          <div class="code-block" @mouseleave="highlightedLine = null">
+            <div class="code-lines">
+              <div v-for="(line, index) in exampleLines" :key="index" class="code-line"
+                :class="{ 'spotlight': highlightedLine === index }" @mouseenter="highlightedLine = index">
+                <span class="line-number">{{ index + 1 }}</span>
+                <span class="line-content">{{ line }}</span>
+              </div>
+            </div>
             <button class="copy-button" @click="copyToClipboard(example)">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -94,6 +100,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const isExpanded = ref(props.initiallyExpanded);
+const highlightedLine = ref<number | null>(null);
 
 const toggleExpanded = () => {
   isExpanded.value = !isExpanded.value;
@@ -120,6 +127,12 @@ const formattedExample = computed(() => {
   if (!props.example) return '';
   // 将 \n 转换为实际的换行符
   return props.example.replace(/\\n/g, '\n');
+});
+
+const exampleLines = computed(() => {
+  if (!formattedExample.value) return [];
+  // 将示例代码按行分割
+  return formattedExample.value.split('\n');
 });
 
 const copyToClipboard = async (text: string) => {
@@ -378,8 +391,7 @@ const copyToClipboard = async (text: string) => {
   border: 1px solid rgba(var(--vp-c-border-rgb), 0.3);
 }
 
-.code-block pre {
-  margin: 0;
+.code-lines {
   padding: 12px 14px 12px 14px;
   padding-right: 50px;
   overflow-x: auto;
@@ -389,6 +401,42 @@ const copyToClipboard = async (text: string) => {
   color: var(--vp-c-text-1);
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+
+.code-line {
+  display: flex;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  margin: 0 -8px;
+  padding: 0 8px;
+}
+
+.code-line.spotlight {
+  transform: scale(1.005) translateX(1px);
+}
+
+.code-line.spotlight .line-number {
+  color: var(--vp-c-brand);
+  opacity: 1;
+  font-weight: 600;
+}
+
+.code-line.spotlight .line-content {
+  color: var(--vp-c-text-1);
+  font-weight: 500;
+}
+
+.line-number {
+  color: var(--vp-c-text-2);
+  opacity: 0.6;
+  margin-right: 12px;
+  min-width: 20px;
+  text-align: right;
+  user-select: none;
+}
+
+.line-content {
+  flex: 1;
 }
 
 .copy-button {
@@ -419,20 +467,34 @@ const copyToClipboard = async (text: string) => {
 }
 
 /* 展开动画 */
-.expand-enter-active,
-.expand-leave-active {
-  transition: all 0.3s ease;
+.expand-enter-active {
+  transition: max-height 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
   overflow: hidden;
 }
 
-.expand-enter-from,
-.expand-leave-to {
+.expand-leave-active {
+  transition: max-height 0.15s ease-in-out, opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+  overflow: hidden;
+}
+
+.expand-enter-from {
   max-height: 0;
   opacity: 0;
   transform: translateY(-10px);
 }
 
-.expand-enter-to,
+.expand-leave-to {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-3px);
+}
+
+.expand-enter-to {
+  max-height: 1000px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .expand-leave-from {
   max-height: 1000px;
   opacity: 1;

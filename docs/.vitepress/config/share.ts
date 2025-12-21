@@ -25,10 +25,15 @@ export const sharedConfig = defineConfig({
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
     ['link', { href: 'https://fonts.googleapis.com/css2?family=Roboto&display=swap', rel: 'stylesheet' }],
+    // 引入自定义字体 JetBrains Maple Mono
+    ['link', { href: 'https://fontsapi.zeoseven.com/521/medium/result.css', onload: "this.rel='stylesheet'", rel: 'preload', as: 'style', crossorigin: '' }],
+    ['noscript', {}, ['link', { rel: 'stylesheet', href: 'https://fontsapi.zeoseven.com/521/medium/result.css' }]],
     // 网页视口
     ['meta', { name: "viewport", content: "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,shrink-to-fit=no" }],
     // 关键词和描述
     ['meta', { name: "keywords", content: "NeoBot,Plugins" }],
+    // 自定义字体样式
+    ['style', {}, 'body { font-family: "JetBrains Maple Mono"; font-weight: normal; }'],
   ],
   appearance: true,
   base: VITE_BASE_URL,

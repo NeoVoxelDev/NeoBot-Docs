@@ -53,7 +53,8 @@ const defaultMembers = [
     title: '开发者',
     links: [
       { icon: 'github', link: 'https://github.com/mc506lw' },
-      { icon : 'QQ', link: 'http://wpa.qq.com/msgrd?v=3&uin=3462689887&site=qq&menu=yes' }
+      { icon : 'QQ', link: 'http://wpa.qq.com/msgrd?v=3&uin=3462689887&site=qq&menu=yes' },
+      { icon : 'Bilibili', link: 'https://space.bilibili.com/696652305' }
     ]
   }
 ]
@@ -61,7 +62,8 @@ const getIconClass = (icon: string) => {
   const iconMap: Record<string, string> = {
     github: 'fab fa-github',
     twitter: 'fab fa-twitter',
-    QQ: 'fab fa-qq'
+    QQ: 'fab fa-qq',
+    Bilibili: 'fab fa-bilibili',
     // 可以添加更多图标映射
   }
   return iconMap[icon] || 'fas fa-link'

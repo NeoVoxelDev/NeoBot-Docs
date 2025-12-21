@@ -14,6 +14,8 @@ import VPCommunityScriptsCN from '../Scripts/VPCommunityScriptsCN.vue';
 import VPCommunityScriptsEN from '../Scripts/VPCommunityScriptsEN.vue';
 import ApiInterfaceCN from '../Api/ApiInterfaceCN.vue';
 import ApiInterfaceEN from '../Api/ApiInterfaceEN.vue';
+import './untils/customCursor.ts';
+import './untils/smoothScroll.ts';
 
 
 
@@ -24,8 +26,8 @@ export default {
   extends: DefaultTheme,
   markdown: {
     // 组件插入h1标题下
-    config: (md) => {
-      md.renderer.rules.heading_close = (tokens, idx, options, env, slf) => {
+    config: (md: any) => {
+      md.renderer.rules.heading_close = (tokens: any, idx: any, options: any, env: any, slf: any) => {
         let htmlResult = slf.renderToken(tokens, idx, options);
         if (tokens[idx].tag === 'h1') htmlResult += `<ArticleMetadata />`;
         return htmlResult;
@@ -46,7 +48,7 @@ export default {
       () => nextTick(() => initZoom())
     );
   },
-  enhanceApp({ app }) {
+  enhanceApp({ app }: any) {
     // 注册全局组件
     app.component('update', update);
     app.component('Linkcard', Linkcard);
