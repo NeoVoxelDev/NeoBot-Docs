@@ -36,16 +36,20 @@ export default {
   },
   setup() {
     const route = useRoute();
+
     const initZoom = () => {
-      // mediumZoom('[data-zoomable]', { background: 'var(--vp-c-bg)' }); // 默认
       mediumZoom(".main img", { background: "var(--vp-c-bg)" });
     };
+
     onMounted(() => {
       initZoom();
     });
+
     watch(
       () => route.path,
-      () => nextTick(() => initZoom())
+      () => nextTick(() => {
+        initZoom();
+      })
     );
   },
   enhanceApp({ app }: any) {

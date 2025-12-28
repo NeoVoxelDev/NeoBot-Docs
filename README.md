@@ -1,6 +1,6 @@
 <div align="center">
 
-![NeoBot Banner](banner.png)
+![NeoBot Banner](banner.webp)
 
 ### NeoBot：连接 Minecraft 与多平台的桥梁
 

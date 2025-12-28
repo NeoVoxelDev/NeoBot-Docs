@@ -6,7 +6,7 @@ hero:
   name: "NeoBot V3"
   tagline: "连接 Minecraft 与 多平台 聊天软件 的 高效插件"
   image:
-    src: ../image/NeoVoxel.png
+    src: ../image/NeoVoxel.webp
     alt: NeoVoxel
   actions:
     - theme: primary

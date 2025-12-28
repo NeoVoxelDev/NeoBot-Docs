@@ -39,6 +39,11 @@ export const sharedConfig = defineConfig({
   base: VITE_BASE_URL,
   lastUpdated: true,
   vite: {
+    resolve: {
+      alias: {
+        'vitepress/theme/components': 'vitepress/dist/client/theme-default/components'
+      }
+    },
     build: {
       chunkSizeWarningLimit: 1600
     },

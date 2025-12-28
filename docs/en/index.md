@@ -6,7 +6,7 @@ hero:
   name: "NeoBot V3"
   tagline: "An efficient plugin for connecting Minecraft with multi-platform chat software"
   image:
-    src: ../image/NeoVoxel.png
+    src: ../image/NeoVoxel.webp
     alt: NeoVoxel
   actions:
     - theme: primary

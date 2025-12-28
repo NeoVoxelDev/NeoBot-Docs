@@ -13,11 +13,18 @@ class SmoothScroll {
   private animationId: number | null = null
   private targetScrollY: number = 0
   private currentScrollY: number = 0
-  private damping: number = 0.85 // 轻微阻尼系数
-  private springStrength: number = 0.08 // 轻微弹簧强度
-  private bounceStrength: number = 0.005 // 回弹强度
-  private maxOverscroll: number = 20 // 最大过度滚动距离
-  private scrollContainer: HTMLElement | null = null
+  private damping: number = 0.85
+  private springStrength: number = 0.25
+  private bounceStrength: number = 0.2
+  private maxOverscroll: number = 20
+  private lastFrameTime: number = 0
+  private velocitySmoothing: number = 0.7
+  private minVelocity: number = 0.05
+  private lerpFactor: number = 0.25
+  private bounceDamping: number = 0.75
+  private isDesktop: boolean = true
+  private hasTouch: boolean = false
+  private switchTimeout: number | null = null
 
   constructor() {
     this.init()
@@ -27,22 +34,100 @@ class SmoothScroll {
    * 初始化平滑滚动
    */
   private init(): void {
-    // 获取当前滚动位置
     this.currentScrollY = window.pageYOffset
     this.targetScrollY = this.currentScrollY
     this.lastScrollY = this.currentScrollY
+    this.lastFrameTime = performance.now()
 
-    // 获取滚动容器
-    this.scrollContainer = document.documentElement || document.body
-
-    // 绑定事件
+    this.setupResponsive()
     this.bindEvents()
-
-    // 添加样式
     this.addStyles()
-
-    // 开始动画循环
     this.animate()
+
+    // 处理页面加载时的初始锚点
+    this.handleInitialHash()
+  }
+
+  /**
+   * 设置响应式检查
+   */
+  private setupResponsive(): void {
+    // 默认启用桌面模式，根据实际使用方式动态调整
+    this.isDesktop = true
+    this.hasTouch = 'ontouchstart' in window ||
+      navigator.maxTouchPoints > 0 ||
+      (navigator as any).msMaxTouchPoints > 0
+
+    // 监听触摸事件，切换到移动端模式
+    window.addEventListener('touchstart', () => {
+      if (!this.isDesktop) return
+
+      // 清除之前的定时器
+      if (this.switchTimeout) {
+        clearTimeout(this.switchTimeout)
+        this.switchTimeout = null
+      }
+
+      // 延迟切换，避免误触
+      this.switchTimeout = window.setTimeout(() => {
+        this.isDesktop = false
+        this.handleDeviceChange()
+      }, 100)
+    }, { passive: true })
+
+    // 监听鼠标事件，切换回桌面端模式
+    window.addEventListener('mousemove', () => {
+      if (this.isDesktop) return
+
+      // 清除之前的定时器
+      if (this.switchTimeout) {
+        clearTimeout(this.switchTimeout)
+        this.switchTimeout = null
+      }
+
+      // 延迟切换，避免误触
+      this.switchTimeout = window.setTimeout(() => {
+        this.isDesktop = true
+        this.handleDeviceChange()
+      }, 100)
+    }, { passive: true })
+  }
+
+  /**
+   * 处理设备类型变化
+   */
+  private handleDeviceChange(): void {
+    if (!this.isDesktop) {
+      // 切换到移动端模式，停止平滑滚动动画
+      this.targetScrollY = window.pageYOffset
+      this.currentScrollY = this.targetScrollY
+      this.scrollVelocity = 0
+      this.isScrolling = false
+
+      // 停止动画循环
+      if (this.animationId) {
+        cancelAnimationFrame(this.animationId)
+        this.animationId = null
+      }
+
+      // 移除桌面端事件监听器，避免干扰触摸滚动
+      window.removeEventListener('wheel', this.wheelHandler)
+      window.removeEventListener('keydown', this.keydownHandler)
+    } else {
+      // 切换回桌面端模式，重新启动动画循环
+      this.currentScrollY = window.pageYOffset
+      this.targetScrollY = this.currentScrollY
+      this.lastFrameTime = performance.now()
+
+      // 重新添加桌面端事件监听器
+      window.addEventListener('wheel', this.wheelHandler, { passive: false })
+      window.addEventListener('keydown', this.keydownHandler)
+
+      // 重新启动动画循环
+      if (!this.animationId) {
+        this.animate()
+      }
+    }
   }
 
   /**
@@ -52,27 +137,31 @@ class SmoothScroll {
     const style = document.createElement('style')
     style.id = 'smooth-scroll-styles'
     style.textContent = `
-      /* 平滑滚动效果 */
-      html {
-        scroll-behavior: auto;
+      /* 平滑滚动效果 - 仅桌面端 */
+      @media (min-width: 769px) {
+        html {
+          scroll-behavior: auto;
+        }
       }
       
-      /* 自定义滚动条样式 */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      
-      ::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.1);
-      }
-      
-      ::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.3);
-        border-radius: 4px;
-      }
-      
-      ::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 0, 0, 0.5);
+      /* 自定义滚动条样式 - 仅桌面端 */
+      @media (min-width: 769px) {
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.1);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.3);
+          border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+          background: rgba(0, 0, 0, 0.5);
+        }
       }
     `
     document.head.appendChild(style)
@@ -82,59 +171,101 @@ class SmoothScroll {
    * 绑定事件监听器
    */
   private bindEvents(): void {
-    // 监听滚轮事件
-    this.wheelHandler = this.handleWheel.bind(this)
-    window.addEventListener('wheel', this.wheelHandler, { passive: false })
-
-    // 监听键盘事件
-    this.keydownHandler = this.handleKeyDown.bind(this)
-    window.addEventListener('keydown', this.keydownHandler)
-
     // 监听窗口大小变化
     this.resizeHandler = this.handleResize.bind(this)
     window.addEventListener('resize', this.resizeHandler)
+
+    // 监听锚点链接点击事件
+    this.clickHandler = this.handleClick.bind(this)
+    document.addEventListener('click', this.clickHandler)
+
+    // 监听 hash 变化事件
+    this.hashChangeHandler = this.handleHashChange.bind(this)
+    window.addEventListener('hashchange', this.hashChangeHandler)
+
+    // 监听触摸事件 - 手机端
+    this.touchStartHandler = this.handleTouchStart.bind(this)
+    this.touchMoveHandler = this.handleTouchMove.bind(this)
+    this.touchEndHandler = this.handleTouchEnd.bind(this)
+    window.addEventListener('touchstart', this.touchStartHandler, { passive: true })
+    window.addEventListener('touchmove', this.touchMoveHandler, { passive: true })
+    window.addEventListener('touchend', this.touchEndHandler, { passive: true })
+
+    // 绑定桌面端事件处理器，但不立即添加监听器
+    this.wheelHandler = this.handleWheel.bind(this)
+    this.keydownHandler = this.handleKeyDown.bind(this)
+
+    // 根据初始模式添加相应的事件监听器
+    if (this.isDesktop) {
+      window.addEventListener('wheel', this.wheelHandler, { passive: false })
+      window.addEventListener('keydown', this.keydownHandler)
+    }
   }
 
   private wheelHandler: (e: WheelEvent) => void = () => { }
   private keydownHandler: (e: KeyboardEvent) => void = () => { }
   private resizeHandler: () => void = () => { }
+  private clickHandler: (e: MouseEvent) => void = () => { }
+  private hashChangeHandler: () => void = () => { }
+  private touchStartHandler: (e: TouchEvent) => void = () => { }
+  private touchMoveHandler: (e: TouchEvent) => void = () => { }
+  private touchEndHandler: (e: TouchEvent) => void = () => { }
+  private touchStartY: number = 0
+  private touchStartTime: number = 0
 
   /**
    * 处理滚轮事件
    */
   private handleWheel(e: WheelEvent): void {
-    // 在移动设备上使用默认行为
-    if (window.innerWidth <= 768) return
+    if (!this.isDesktop) return
 
     e.preventDefault()
 
-    // 计算滚动增量，限制滚动速度
     const delta = e.deltaY
-    const multiplier = e.deltaMode === WheelEvent.DOM_DELTA_LINE ? 20 : 1
-    const scrollDelta = Math.min(Math.max(delta * multiplier, -100), 100) // 限制单次滚动距离
+    const multiplier = e.deltaMode === WheelEvent.DOM_DELTA_LINE ? 30 : 1.5
+    const scrollDelta = Math.min(Math.max(delta * multiplier, -150), 150)
 
-    // 更新目标滚动位置
     this.targetScrollY += scrollDelta
 
-    // 获取实际滚动范围
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight
 
-    // 允许一定程度的过度滚动，但限制最大过度滚动距离
     if (this.targetScrollY < -this.maxOverscroll) {
       this.targetScrollY = -this.maxOverscroll
     } else if (this.targetScrollY > maxScroll + this.maxOverscroll) {
       this.targetScrollY = maxScroll + this.maxOverscroll
     }
 
-    // 计算滚动速度
-    const now = Date.now()
+    const now = performance.now()
     const timeDelta = Math.max(1, now - this.lastScrollTime)
 
-    this.scrollVelocity = scrollDelta / timeDelta * 1 // 进一步降低速度影响
+    const newVelocity = scrollDelta / timeDelta * 16
+    this.scrollVelocity = this.scrollVelocity * this.velocitySmoothing + newVelocity * (1 - this.velocitySmoothing)
 
     this.lastScrollTime = now
     this.lastScrollY = this.targetScrollY
     this.isScrolling = true
+  }
+
+  /**
+   * 处理触摸事件 - 手机端滚动
+   */
+  private handleTouchStart(e: TouchEvent): void {
+    if (this.isDesktop) return
+
+    this.touchStartY = e.touches[0].clientY
+    this.touchStartTime = performance.now()
+  }
+
+  private handleTouchMove(e: TouchEvent): void {
+    if (this.isDesktop) return
+
+    // 让浏览器处理原生滚动
+  }
+
+  private handleTouchEnd(e: TouchEvent): void {
+    if (this.isDesktop) return
+
+    // 让浏览器处理原生滚动
   }
 
   /**
@@ -187,59 +318,111 @@ class SmoothScroll {
   }
 
   /**
+   * 处理点击事件 - 处理锚点链接
+   */
+  private handleClick(e: MouseEvent): void {
+    const target = e.target as HTMLElement
+    const link = target.closest('a') as HTMLAnchorElement
+
+    if (!link) return
+
+    const href = link.getAttribute('href')
+
+    // 检查是否是锚点链接
+    if (href && href.startsWith('#')) {
+      const targetId = href.substring(1)
+      const targetElement = document.getElementById(targetId)
+
+      if (targetElement) {
+        e.preventDefault()
+
+        // 计算偏移量，考虑可能的导航栏高度
+        const offset = 80
+        this.scrollToElement(targetElement, offset, 1000)
+
+        // 更新 URL hash 但不触发滚动
+        history.pushState(null, '', href)
+      }
+    }
+  }
+
+  /**
+   * 处理 hash 变化事件
+   */
+  private handleHashChange(): void {
+    const hash = window.location.hash
+    if (hash) {
+      const targetId = hash.substring(1)
+      const targetElement = document.getElementById(targetId)
+
+      if (targetElement) {
+        const offset = 80
+        this.scrollToElement(targetElement, offset, 1000)
+      }
+    }
+  }
+
+  /**
    * 动画循环
    */
   private animate(): void {
-    // 获取实际滚动范围
+    const now = performance.now()
+    const deltaTime = Math.min((now - this.lastFrameTime) / 16.67, 2)
+    this.lastFrameTime = now
+
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight
 
-    // 如果不在滚动中，应用惯性
-    if (!this.isScrolling && Math.abs(this.scrollVelocity) > 0.01) {
-      this.targetScrollY += this.scrollVelocity * 16 // 假设60fps，每帧约16ms
-      this.scrollVelocity *= this.damping
+    if (!this.isScrolling && Math.abs(this.scrollVelocity) > this.minVelocity) {
+      this.targetScrollY += this.scrollVelocity * deltaTime
+      this.scrollVelocity *= Math.pow(this.damping, deltaTime)
     }
 
-    // 计算过度滚动（用于回弹效果）
+    if (this.targetScrollY < -this.maxOverscroll) {
+      this.targetScrollY = -this.maxOverscroll
+    } else if (this.targetScrollY > maxScroll + this.maxOverscroll) {
+      this.targetScrollY = maxScroll + this.maxOverscroll
+    }
+
     let actualScrollY = this.targetScrollY
-    let overscrollResistance = 1
 
     if (this.targetScrollY < 0) {
-      // 顶部过度滚动，应用阻力
       const overscroll = Math.abs(this.targetScrollY)
-      overscrollResistance = 1 - Math.min(overscroll / this.maxOverscroll, 0.8)
-      actualScrollY = this.targetScrollY * overscrollResistance
+      const clampedOverscroll = Math.min(overscroll, this.maxOverscroll)
+      const normalizedOverscroll = clampedOverscroll / this.maxOverscroll
+      const resistance = 1 - normalizedOverscroll * 0.9
+      actualScrollY = -clampedOverscroll * resistance
 
-      // 应用温和的回弹力，只在过度滚动时生效
-      if (overscroll > 10) {
-        this.scrollVelocity += (0 - this.targetScrollY) * this.bounceStrength * 0.3
+      if (overscroll > 5) {
+        const bounceForce = (0 - this.targetScrollY) * this.bounceStrength * normalizedOverscroll
+        this.scrollVelocity += bounceForce * deltaTime
+        this.scrollVelocity *= Math.pow(this.bounceDamping, deltaTime)
       }
     } else if (this.targetScrollY > maxScroll) {
-      // 底部过度滚动，应用阻力
       const overscroll = this.targetScrollY - maxScroll
-      overscrollResistance = 1 - Math.min(overscroll / this.maxOverscroll, 0.8)
-      actualScrollY = maxScroll + (this.targetScrollY - maxScroll) * overscrollResistance
+      const clampedOverscroll = Math.min(overscroll, this.maxOverscroll)
+      const normalizedOverscroll = clampedOverscroll / this.maxOverscroll
+      const resistance = 1 - normalizedOverscroll * 0.9
+      actualScrollY = maxScroll + clampedOverscroll * resistance
 
-      // 应用温和的回弹力，只在过度滚动时生效
-      if (overscroll > 10) {
-        this.scrollVelocity += (maxScroll - this.targetScrollY) * this.bounceStrength * 0.3
+      if (overscroll > 5) {
+        const bounceForce = (maxScroll - this.targetScrollY) * this.bounceStrength * normalizedOverscroll
+        this.scrollVelocity += bounceForce * deltaTime
+        this.scrollVelocity *= Math.pow(this.bounceDamping, deltaTime)
       }
     }
 
-    // 平滑过渡到目标位置
     const diff = actualScrollY - this.currentScrollY
-    this.currentScrollY += diff * this.springStrength
+    const lerpFactor = 1 - Math.pow(1 - this.lerpFactor, deltaTime)
+    this.currentScrollY += diff * lerpFactor
 
-    // 应用滚动位置
     window.scrollTo(0, this.currentScrollY)
 
-    // 重置滚动状态
     if (this.isScrolling) {
       setTimeout(() => {
         this.isScrolling = false
-      }, 150) // 增加延迟，确保连续滚动时状态正确
+      }, 100)
     }
 
-    // 继续动画循环
     this.animationId = requestAnimationFrame(() => this.animate())
   }
 
@@ -247,32 +430,25 @@ class SmoothScroll {
    * 滚动到指定位置
    */
   public scrollTo(y: number, duration: number = 800): void {
-    // 确保滚动位置在有效范围内
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight
     const targetY = Math.max(0, Math.min(maxScroll, y))
 
     const startY = this.currentScrollY
     const distance = targetY - startY
-    const startTime = Date.now()
+    const startTime = performance.now()
 
-    // 立即设置目标位置
     this.targetScrollY = targetY
     this.isScrolling = true
 
-    // 使用动画循环平滑滚动
     const scrollAnimation = () => {
-      const now = Date.now()
+      const now = performance.now()
       const elapsed = now - startTime
       const progress = Math.min(elapsed / duration, 1)
 
-      // 使用缓动函数
-      const easeInOutCubic = progress < 0.5
-        ? 4 * progress * progress * progress
-        : 1 - Math.pow(-2 * progress + 2, 3) / 2
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4)
 
-      this.currentScrollY = startY + distance * easeInOutCubic
+      this.currentScrollY = startY + distance * easeOutQuart
 
-      // 应用滚动位置
       window.scrollTo(0, this.currentScrollY)
 
       if (progress < 1) {
@@ -304,6 +480,12 @@ class SmoothScroll {
    * 销毁平滑滚动
    */
   public destroy(): void {
+    // 清除切换定时器
+    if (this.switchTimeout) {
+      clearTimeout(this.switchTimeout)
+      this.switchTimeout = null
+    }
+
     if (this.animationId) {
       cancelAnimationFrame(this.animationId)
     }
@@ -312,6 +494,11 @@ class SmoothScroll {
     window.removeEventListener('wheel', this.wheelHandler)
     window.removeEventListener('keydown', this.keydownHandler)
     window.removeEventListener('resize', this.resizeHandler)
+    document.removeEventListener('click', this.clickHandler)
+    window.removeEventListener('hashchange', this.hashChangeHandler)
+    window.removeEventListener('touchstart', this.touchStartHandler)
+    window.removeEventListener('touchmove', this.touchMoveHandler)
+    window.removeEventListener('touchend', this.touchEndHandler)
 
     // 移除样式
     const styleElement = document.getElementById('smooth-scroll-styles')
@@ -319,20 +506,31 @@ class SmoothScroll {
       styleElement.remove()
     }
   }
+
+  /**
+   * 处理页面加载时的初始锚点
+   */
+  private handleInitialHash(): void {
+    const hash = window.location.hash
+    if (hash) {
+      const targetId = hash.substring(1)
+      const targetElement = document.getElementById(targetId)
+
+      if (targetElement) {
+        // 等待页面完全加载后再滚动
+        setTimeout(() => {
+          const offset = 80
+          this.scrollToElement(targetElement, offset, 1000)
+        }, 300)
+      }
+    }
+  }
 }
 
 // 导出类
 export default SmoothScroll
 
-// 自动初始化
+// 将类挂载到全局 window 对象
 if (typeof window !== 'undefined') {
-  // 只在桌面设备上初始化
-  document.addEventListener('DOMContentLoaded', () => {
-    if (window.innerWidth > 768) {
-      const smoothScroll = new SmoothScroll()
-
-      // 将实例暴露到全局，方便其他脚本使用
-      window.smoothScroll = smoothScroll
-    }
-  })
+  ; (window as any).SmoothScroll = SmoothScroll
 }

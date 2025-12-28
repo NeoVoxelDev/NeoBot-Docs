@@ -5,7 +5,6 @@
 
 class CustomCursor {
   private cursor: HTMLElement | null = null
-  private cursorInner: HTMLElement | null = null
   private isMouseOverInteractive: boolean = false
   private isMouseOverText: boolean = false
   private checkMousePosition: (target: HTMLElement) => void = () => { }
@@ -13,7 +12,11 @@ class CustomCursor {
   private mouseY: number = 0
   private cursorX: number = 0
   private cursorY: number = 0
+  private outerX: number = 0
+  private outerY: number = 0
   private animationId: number | null = null
+  private lerpFactor: number = 0.35
+  private outerLerpFactor: number = 0.25
 
   constructor() {
     this.init()
@@ -23,11 +26,15 @@ class CustomCursor {
    * 初始化自定义鼠标
    */
   private init(): void {
-    // 创建自定义鼠标元素
+    this.mouseX = window.innerWidth / 2
+    this.mouseY = window.innerHeight / 2
+    this.cursorX = this.mouseX
+    this.cursorY = this.mouseY
+    this.outerX = this.mouseX
+    this.outerY = this.mouseY
+
     this.createCursor()
-    // 绑定事件
     this.bindEvents()
-    // 开始动画循环
     this.animate()
   }
 
@@ -35,7 +42,6 @@ class CustomCursor {
    * 创建自定义鼠标DOM元素
    */
   private createCursor(): void {
-    // 外圈
     this.cursor = document.createElement('div')
     this.cursor.className = 'custom-cursor'
     this.cursor.innerHTML = `
@@ -44,10 +50,6 @@ class CustomCursor {
     `
     document.body.appendChild(this.cursor)
 
-    // 获取内圈元素
-    this.cursorInner = this.cursor.querySelector('.custom-cursor-inner') as HTMLElement
-
-    // 添加样式
     this.addStyles()
   }
 
@@ -57,18 +59,15 @@ class CustomCursor {
   private addStyles(): void {
     const style = document.createElement('style')
     style.textContent = `
-      /* 隐藏默认鼠标 */
       * {
         cursor: none !important;
       }
       
-      /* 文本输入元素隐藏默认光标 */
       input[type="text"], input[type="password"], input[type="email"], 
       input[type="search"], input[type="url"], textarea, [contenteditable="true"] {
         cursor: none !important;
       }
       
-      /* 自定义鼠标样式 */
       .custom-cursor {
         position: fixed;
         top: 0;
@@ -78,7 +77,6 @@ class CustomCursor {
         pointer-events: none;
         z-index: 9999;
         mix-blend-mode: difference;
-        transition: transform 0.05s ease-out;
       }
       
       .custom-cursor-outer {
@@ -89,8 +87,8 @@ class CustomCursor {
         height: 100%;
         border: 1.5px solid rgba(255, 255, 255, 0.5);
         border-radius: 50%;
-        transform: translate(-50%, -50%);
-        transition: all 0.05s ease-out;
+        transition: width 0.3s ease-out, height 0.3s ease-out, border-color 0.3s ease-out;
+        will-change: transform;
       }
       
       .custom-cursor-inner {
@@ -101,53 +99,45 @@ class CustomCursor {
         height: 8px;
         background-color: rgba(255, 255, 255, 0.8);
         border-radius: 50%;
-        transform: translate(-50%, -50%);
-        transition: all 0.02s ease-out;
+        transition: width 0.3s ease-out, height 0.3s ease-out, background-color 0.3s ease-out;
+        will-change: transform;
       }
       
-      /* 悬停在交互元素上的效果 */
       .custom-cursor.hover .custom-cursor-outer {
-        width: 25px;
-        height: 25px;
-        border-color: rgba(255, 255, 255, 0.8);
+        width: 28px;
+        height: 28px;
+        border-color: rgba(255, 255, 255, 0.7);
       }
       
       .custom-cursor.hover .custom-cursor-inner {
-        width: 4px;
-        height: 4px;
-        background-color: rgba(255, 255, 255, 0.9);
+        width: 6px;
+        height: 6px;
+        background-color: rgba(255, 255, 255, 0.85);
       }
       
-      /* 点击效果 */
       .custom-cursor.click .custom-cursor-outer {
-        width: 15px;
-        height: 15px;
-        border-color: rgba(255, 255, 255, 0.9);
+        width: 16px;
+        height: 16px;
+        border-color: rgba(255, 255, 255, 0.85);
       }
       
       .custom-cursor.click .custom-cursor-inner {
-        width: 12px;
-        height: 12px;
-        background-color: rgba(255, 255, 255, 0.9);
+        width: 10px;
+        height: 10px;
+        background-color: rgba(255, 255, 255, 0.85);
       }
       
-      /* 文本选择和输入时的效果 */
       .custom-cursor.text .custom-cursor-outer {
-        width: 2px;
-        height: 20px;
-        border: none;
-        background-color: rgba(255, 255, 255, 0.8);
-        border-radius: 1px;
+        opacity: 0;
       }
       
       .custom-cursor.text .custom-cursor-inner {
         width: 2px;
-        height: 20px;
+        height: 22px;
         background-color: rgba(255, 255, 255, 0.8);
         border-radius: 1px;
       }
       
-      /* 在移动设备上隐藏自定义鼠标 */
       @media (max-width: 768px) {
         .custom-cursor {
           display: none;
@@ -296,12 +286,30 @@ class CustomCursor {
    * 动画循环
    */
   private animate(): void {
-    // 极弱阻尼的平滑过渡效果
-    this.cursorX += (this.mouseX - this.cursorX) * 0.95
-    this.cursorY += (this.mouseY - this.cursorY) * 0.95
+    const dx = this.mouseX - this.cursorX
+    const dy = this.mouseY - this.cursorY
+    const distance = Math.sqrt(dx * dx + dy * dy)
+
+    const dynamicLerpFactor = distance > 50 ? this.lerpFactor * 1.5 : this.lerpFactor
+
+    this.cursorX += dx * dynamicLerpFactor
+    this.cursorY += dy * dynamicLerpFactor
+
+    const outerDx = this.mouseX - this.outerX
+    const outerDy = this.mouseY - this.outerY
+    this.outerX += outerDx * this.outerLerpFactor
+    this.outerY += outerDy * this.outerLerpFactor
 
     if (this.cursor) {
-      this.cursor.style.transform = `translate3d(${this.cursorX}px, ${this.cursorY}px, 0)`
+      const outer = this.cursor.querySelector('.custom-cursor-outer') as HTMLElement
+      const inner = this.cursor.querySelector('.custom-cursor-inner') as HTMLElement
+
+      if (outer) {
+        outer.style.transform = `translate3d(${this.outerX}px, ${this.outerY}px, 0) translate(-50%, -50%)`
+      }
+      if (inner) {
+        inner.style.transform = `translate3d(${this.cursorX}px, ${this.cursorY}px, 0) translate(-50%, -50%)`
+      }
     }
 
     this.animationId = requestAnimationFrame(() => this.animate())
@@ -320,25 +328,30 @@ class CustomCursor {
       this.cursor = null
     }
 
-    // 移除样式
+    // 移除样式并恢复默认鼠标
     const styles = document.querySelectorAll('style')
     styles.forEach(style => {
       if (style.textContent?.includes('custom-cursor')) {
         style.remove()
       }
     })
+
+    // 恢复默认鼠标样式
+    const cursorStyle = document.createElement('style')
+    cursorStyle.id = 'restore-cursor-style'
+    cursorStyle.textContent = `
+      * {
+        cursor: auto !important;
+      }
+    `
+    document.head.appendChild(cursorStyle)
   }
 }
 
 // 导出类
 export default CustomCursor
 
-// 自动初始化
+// 将类挂载到全局 window 对象
 if (typeof window !== 'undefined') {
-  // 只在非移动设备上初始化
-  if (!('ontouchstart' in window)) {
-    document.addEventListener('DOMContentLoaded', () => {
-      new CustomCursor()
-    })
-  }
+  ; (window as any).CustomCursor = CustomCursor
 }
