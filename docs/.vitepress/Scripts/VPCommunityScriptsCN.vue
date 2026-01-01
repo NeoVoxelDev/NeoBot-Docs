@@ -32,7 +32,7 @@ const fetchScripts = async () => {
     isLoading.value = true
     error.value = null
 
-    const response = await fetch('https://hub.gitmirror.com/https://github.com/NeoVoxelDev/NeoBotScriptsRepo/raw/refs/heads/main/repo.json')
+    const response = await fetch('https://gh-proxy.org/https:/github.com/NeoVoxelDev/NeoBotScriptsRepo/raw/refs/heads/main/repo.json')
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
