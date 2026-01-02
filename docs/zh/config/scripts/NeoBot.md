@@ -164,6 +164,7 @@
   interface-name="GroupInfo" 
   interface-type="interface" 
   description="群组信息接口，提供群组相关信息"
+  tip="GroupInfo 接口的 getGroupMemberCount() 方法不存在\n- GroupInfo 接口实际上不包含 getGroupMemberCount() 方法\n- 调用 getGroupMemberCount() 会抛出 &quot;Unknown identifier: getGroupMemberCount&quot; 异常\n- d.ts 类型定义中的 getGroupMemberCount() 是不准确的\n\n注意: 无法通过 GroupInfo 获取群成员数量"
   :parameters="[
     { name: 'getGroupId', type: '() => number', required: true, description: '获取群组 ID' },
     { name: 'getGroupName', type: '() => string', required: true, description: '获取群组名称' },
@@ -180,6 +181,7 @@
   interface-name="GroupMemberInfo" 
   interface-type="interface" 
   description="群成员信息接口，提供群成员详细信息"
+  tip="GroupMemberInfo 接口的 getCardChangeable() 方法不存在\n- GroupMemberInfo 接口实际上不包含 getCardChangeable() 方法\n- 调用 getCardChangeable() 会抛出 &quot;Unknown identifier: getCardChangeable&quot; 异常\n- d.ts 类型定义中的 getCardChangeable() 是不准确的\n\n注意: 无法通过 GroupMemberInfo 获取群名片是否可修改"
   :parameters="[
     { name: 'getGroupId', type: '() => number', required: true, description: '获取群组 ID' },
     { name: 'getUserId', type: '() => number', required: true, description: '获取用户 ID' },
@@ -380,6 +382,7 @@
   interface-name="Http" 
   interface-type="interface" 
   description="HTTP 接口，用于创建 HTTP 请求构建器"
+  tip="HTTP 接口的 URL 格式要求\n- http.builder() 的 URL 参数必须包含协议（http:// 或 https://）\n- 缺少协议时会抛出 &quot;no protocol: &lt;url&gt;&quot; 异常\n- 错误示例: http.builder(&quot;example.com&quot;) 会抛出 &quot;no protocol: example.com&quot;\n- 正确示例: http.builder(&quot;https://example.com&quot;)\n- 正确示例: http.builder(&quot;http://localhost:8080&quot;)\n\n注意: URL 必须是完整的绝对路径，包含协议、域名和可选的端口\n\nHTTP 接口的超时处理机制\n- 当请求超时时会抛出 &quot;Read timed out&quot; 异常\n- 需要使用 try-catch 来捕获和处理超时异常\n- 三种超时设置方法:\n  - timeout(): 设置总体超时时间（毫秒）\n  - connectTimeout(): 设置连接超时时间（毫秒）\n  - readTimeout(): 设置读取超时时间（毫秒）\n\nHTTP 接口的状态码处理\n- HttpResult.getStatusCode() 返回 HTTP 状态码\n- 即使返回 404、500 等错误状态码，connect() 也不会抛出异常\n- 需要手动检查状态码来判断请求是否成功\n\n注意: 不要假设状态码为 200 就是成功，应该根据业务需求判断\n\nHTTP 接口的链式调用\n- HttpRequest 支持链式调用，可以连续设置多个参数\n- 可以同时设置多个超时参数和请求头\n\n注意: 链式调用的顺序不影响最终效果"
   :parameters="[
     { name: 'builder', type: '(url: string): HttpBuilder', required: true, description: '创建指定 URL 的 HTTP 请求构建器' }
   ]"
@@ -521,6 +524,7 @@
   interface-name="DatabaseTable" 
   interface-type="interface" 
   description="数据库表接口，提供表操作方法"
+  tip="Database 接口的 table.create() 列定义语法限制\n- H2 数据库不支持在 column() 的 extraOptions 参数中使用 &quot;PRIMARY KEY IDENTITY&quot; 组合\n- PRIMARY KEY 和 IDENTITY 必须分开定义或使用不同的语法\n- 错误语法会抛出 SQL 语法错误：&quot;expected &quot;HASH, CONSTRAINT, COMMENT, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )&quot;&quot;\n\n注意: extraOptions 参数应该只包含一个约束条件，多个约束需要多次调用 column()\n\nDatabase 接口的 insert/update/delete/alter 静默失败行为\n- insert()、update()、delete()、alter() 方法在 SQL 执行失败时不会抛出异常\n- 这些方法会捕获 SQL 异常并静默失败，返回 SUCCESS\n- 需要检查日志中的 SQL 错误来发现失败\n\n注意: 这些方法不会返回错误信息，只能通过日志来判断是否成功\n\nDatabase 接口的 select() 错误处理\n- select() 方法在 SQL 执行失败时返回 null，而不是抛出异常\n- 调用 null 的 map()、getFirst()、get() 方法会抛出异常\n- 需要先检查返回值是否为 null\n\n注意: select() 是唯一会返回 null 的方法，其他操作方法静默失败"
   :parameters="[
     { name: 'drop', type: '(): void', required: true, description: '删除表' },
     { name: 'delete', type: '(): DatabaseDeleter', required: true, description: '创建删除操作' },
@@ -540,6 +544,7 @@
   interface-name="DatabaseStorage" 
   interface-type="interface" 
   description="数据库存储接口，用于获取表对象"
+  tip="Database 接口的表名大小写敏感性\n- H2 数据库默认将表名转换为大写\n- 创建表时使用小写名称，查询时表名会被转换为大写\n- 错误信息中显示的表名是大写的（如 &quot;TEST_DB_TABLE&quot;）\n\n注意: 这可能导致混淆，特别是在错误信息中\n\nDatabase 接口的 SQL 错误分类\n- H2 数据库的 SQL 错误会以 WARN 级别记录到日志\n- 错误信息包含完整的 SQL 语句和错误位置\n- 常见错误代码:\n  - 42001: SQL 语法错误\n  - 42102: 表或视图不存在\n\n注意: 错误信息中的 [*] 标记了 SQL 语法错误的位置"
   :parameters="[
     { name: 'table', type: '(name: string): DatabaseTable', required: true, description: '获取指定名称的表对象' }
   ]"
@@ -553,6 +558,7 @@
   interface-name="QQ" 
   interface-type="interface" 
   description="QQ 接口，提供 QQ 机器人相关操作方法"
+  tip="QQ.sendGroupMessage 和 QQ.sendPrivateMessage 的 message 参数必须是 JSON Array 格式的字符串\n错误用法: qq.sendGroupMessage(groupId, &quot;Hello World&quot;)\n错误用法: qq.sendGroupMessage(groupId, '{&quot;type&quot;:&quot;text&quot;,&quot;text&quot;:&quot;Hello&quot;}')\n\n正确用法: qq.sendGroupMessage(groupId, JSON.stringify([{&quot;type&quot;:&quot;text&quot;, &quot;data&quot;:{&quot;text&quot;:&quot;Hello&quot;}}]))\n正确用法: qq.sendPrivateMessage(userId, JSON.stringify([{&quot;type&quot;:&quot;text&quot;, &quot;data&quot;:{&quot;text&quot;:&quot;Hello&quot;}}]))\n\n消息格式说明:\n- message 参数必须是字符串类型，且必须是有效的 JSON Array 格式\n- JSON Array 必须以 '[' 开头，以 ']' 结尾\n- 每个 Array 元素是一个消息对象，包含 type 和 data 字段\n- 常见消息类型:\n  - text: {&quot;type&quot;:&quot;text&quot;, &quot;data&quot;:{&quot;text&quot;:&quot;消息内容&quot;}}\n  - image: {&quot;type&quot;:&quot;image&quot;, &quot;data&quot;:{&quot;url&quot;:&quot;图片URL&quot;}}\n  - at: {&quot;type&quot;:&quot;at&quot;, &quot;data&quot;:{&quot;qq&quot;:用户QQ号}}\n  - face: {&quot;type&quot;:&quot;face&quot;, &quot;data&quot;:{&quot;id&quot;:表情ID}}\n\n注意: d.ts 中的类型定义为 message: string 是不准确的，实际要求是 JSON Array 字符串"
   :parameters="[
     { name: 'register', type: '(eventName: string, callback: (arg: QQEvent) => void): void', required: true, description: '注册事件监听器' },
     { name: 'sendGroupMessage', type: '(groupId: number, message: string): void', required: true, description: '发送群消息' },
@@ -585,6 +591,7 @@
   interface-name="Config" 
   interface-type="interface" 
   description="配置接口，用于读取和写入配置文件"
+  tip="Config 接口的数据类型严格性\n- Config 的各种 get 方法对数据类型有严格要求，类型不匹配时会抛出异常\n- getString() 只能获取字符串类型的值，如果值是数组或其他类型会抛出异常\n  - 错误示例: generalConfig.getString(&quot;enable-groups&quot;) 当该键的值是数组时会抛出 &quot;JSONObject[&quot;enable-groups&quot;] is not a string&quot;\n- getStringArray() 只能获取字符串数组，如果数组元素是数字会抛出异常\n  - 错误示例: generalConfig.getStringArray(&quot;numbers&quot;) 当数组包含数字时会抛出 &quot;JSONArray[0] is not a String&quot;\n- getNumberArray() 只能获取数字数组\n- getInt() 和 getDouble() 只能获取数字类型的值\n- getBoolean() 只能获取布尔类型的值\n\n注意: 使用 Config 的 get 方法前，需要确保配置文件中该键的值类型与方法要求的类型一致\n\nConfig 接口的键不存在时的行为\n- Config 的各种 get 方法在键不存在时会抛出异常，不会返回 null 或默认值\n- getString(), getInt(), getDouble(), getBoolean(), getStringArray(), getNumberArray() 等方法在键不存在时会抛出异常\n  - 错误示例: generalConfig.getString(&quot;non&quot;) 会抛出 &quot;JSONObject[&quot;non&quot;] not found&quot;\n- getMessage() 在键不存在时也会抛出异常\n\n解决方案:\n- 使用 has() 方法检查键是否存在\n- 使用 addOption() 方法为键设置默认值，这样即使键不存在也不会抛出异常\n  - 示例: generalConfig.addOption(&quot;myKey&quot;, &quot;defaultValue&quot;)\n\nConfig.has() 方法的潜在问题\n- has() 方法可能无法正确检测某些类型的配置项\n- 测试显示某些存在的键可能被 has() 返回 false\n  - 示例: generalConfig.has(&quot;enable-groups&quot;) 可能返回 false，即使该键存在于配置文件中\n\n注意: 不要完全依赖 has() 方法来判断键是否存在，建议结合 try-catch 使用\n\nConfig.put() 和 Config.addOption() 的区别\n- put() 方法可以添加新键值对，但不会持久化到配置文件\n  - 示例: generalConfig.put(&quot;test&quot;, &quot;value&quot;) 只在内存中有效\n- addOption() 方法也可以添加新键值对，并可以设置默认值\n  - 示例: generalConfig.addOption(&quot;test&quot;, &quot;defaultValue&quot;)\n\n注意: 两个方法都不会将修改持久化到配置文件，重启后修改会丢失"
   :parameters="[
     { name: 'getString', type: '(node: string): string', required: true, description: '获取字符串配置值' },
     { name: 'getDouble', type: '(node: string): number', required: true, description: '获取双精度浮点数配置值' },
@@ -610,6 +617,7 @@
   interface-name="Logger" 
   interface-type="interface" 
   description="日志接口，用于记录日志信息"
+  tip="Logger 接口的 trace() 方法不存在\n- Logger 接口实际上不包含 trace() 方法\n- 调用 trace() 会抛出 &quot;Unknown identifier: trace&quot; 异常\n- d.ts 类型定义中的 trace() 是不准确的\n\n注意: 只能使用 info(), warn(), error(), debug() 四个方法\n\nLogger 接口的类型严格性\n- Logger 的所有方法只接受字符串类型参数\n- 传递非字符串类型会抛出类型转换异常\n- null 和 undefined 会被自动转换为字符串 &quot;null&quot;\n\n错误示例:\nlogger.info(12345);  // 抛出 &quot;Cannot convert '12345' to Java type 'java.lang.String'&quot;\nlogger.info(true);   // 抛出 &quot;Cannot convert 'true' to Java type 'java.lang.String'&quot;\nlogger.info({});     // 抛出 &quot;Cannot convert '{...}' to Java type 'java.lang.String'&quot;\nlogger.info([]);     // 抛出 &quot;Cannot convert '(n)[...]' to Java type 'java.lang.String'&quot;\n\n正确示例:\nlogger.info(&quot;12345&quot;);     // 输出: 12345\nlogger.info(&quot;true&quot;);      // 输出: true\nlogger.info(JSON.stringify({}));  // 输出: {}\nlogger.info(null);        // 输出: null\nlogger.info(undefined);   // 输出: null\n\n注意: 传递非字符串参数前应该先转换为字符串"
   :parameters="[
     { name: 'info', type: '(message: string): void', required: true, description: '记录信息级别日志' },
     { name: 'warn', type: '(message: string): void', required: true, description: '记录警告级别日志' },
@@ -627,6 +635,7 @@
   interface-name="ScriptManager" 
   interface-type="interface" 
   description="脚本管理器接口，用于管理脚本和方法"
+  tip="ScriptManager 接口的 callJsMethod() 参数传递规则\n- callJsMethod() 将所有参数打包成一个数组传递给方法\n- 方法签名应该接收一个数组参数，而不是多个独立参数\n- 如果方法期望数组但接收到单个值，会抛出 &quot;is not iterable&quot; 错误\n\n错误示例:\nscriptManager.addJsMethod(&quot;test.sum&quot;, (a, b) => {\n    return a + b;  // 这会失败，因为a和b不是数字\n});\nscriptManager.callJsMethod(&quot;test.sum&quot;, 1, 2);  // 抛出 &quot;1 is not iterable&quot;\n\n正确示例:\nscriptManager.addJsMethod(&quot;test.sum&quot;, (args) => {\n    return args[0] + args[1];  // 从数组中获取参数\n});\nscriptManager.callJsMethod(&quot;test.sum&quot;, 1, 2);  // 返回 3\n\n注意: 即使传递一个数组参数，也会被再次包装成数组的数组\n\nScriptManager 接口的 callJsMethod() 调用不存在的方法\n- 调用不存在的方法会抛出异常\n- 错误信息: &quot;Cannot invoke &quot;dev.neovoxel.neobot.util.ValueWithScript.getValue()&quot; because the return value of &quot;java.util.Map.get(Object)&quot; is null&quot;\n- 应该先使用 hasJsMethod() 检查方法是否存在\n\n示例:\nif (scriptManager.hasJsMethod(&quot;test.method&quot;)) {\n    const result = scriptManager.callJsMethod(&quot;test.method&quot;, args);\n} else {\n    logger.error(&quot;Method does not exist&quot;);\n}\n\n注意: 调用不存在的方法会导致空指针异常\n\nScriptManager 接口的 addJsMethod() 方法覆盖行为\n- 可以使用相同的方法名添加新方法\n- 旧方法会被新方法覆盖，不会抛出异常\n- 这允许动态更新方法实现\n\n示例:\nscriptManager.addJsMethod(&quot;test.method&quot;, () => {\n    return &quot;version 1&quot;;\n});\n\nscriptManager.addJsMethod(&quot;test.method&quot;, () => {\n    return &quot;version 2&quot;;  // 覆盖版本1\n});\n\n注意: 覆盖操作是静默的，不会发出警告\n\nScriptManager 接口的错误传播\n- 方法中抛出的错误会正确传播到调用者\n- 错误信息和方法内部抛出的一致\n- 调用者可以捕获并处理这些错误\n\n示例:\nscriptManager.addJsMethod(&quot;test.error&quot;, () => {\n    throw new Error(&quot;Custom error&quot;);\n});\n\ntry {\n    scriptManager.callJsMethod(&quot;test.error&quot;);\n} catch (e) {\n    logger.error(&quot;Caught: &quot; + e.message);  // 输出 &quot;Caught: Custom error&quot;\n}\n\n注意: 所有错误都应该在调用处进行适当的处理\n\nScriptManager 接口的 null 和 undefined 参数处理\n- null 和 undefined 参数会被传递给方法\n- 在数学运算中，null 和 undefined 会被当作 0 处理\n- 其他操作可能会产生不同的结果\n\n示例:\nscriptManager.addJsMethod(&quot;test.add&quot;, (args) => {\n    return args[0] + args[1];\n});\n\nscriptManager.callJsMethod(&quot;test.add&quot;, undefined, 5);  // 返回 0\nscriptManager.callJsMethod(&quot;test.add&quot;, null, 5);      // 返回 0\n\n注意: 应该在方法内部进行参数验证\n\nScriptManager 接口的 loadParser() 和 parse() 行为\n- loadParser() 会替换之前的解析器，不会抛出异常\n- parse() 使用当前加载的解析器处理内容\n- 解析器可以完全自定义内容的处理方式\n\n示例:\nscriptManager.loadParser((content) => {\n    return content.toUpperCase();\n});\n\nconst result = scriptManager.parse(&quot;hello&quot;);  // 返回 &quot;HELLO&quot;\n\n注意: 解析器是全局的，会影响所有后续的 parse() 调用"
   :parameters="[
     { name: 'loadParser', type: '(parser: (arg: string) => string): void', required: true, description: '加载解析器' },
     { name: 'parse', type: '(content: string): string', required: true, description: '解析内容' },
@@ -656,6 +665,7 @@
   interface-name="Scheduler" 
   interface-type="interface" 
   description="调度器接口，用于执行计划任务"
+  tip="Scheduler 接口的 submitAsync() 多线程限制\n- submitAsync() 在异步线程执行时会抛出异常\n- 错误信息: &quot;Multi threaded access requested by thread ... but is not allowed for language(s) js&quot;\n- JavaScript 引擎（GraalVM）不支持多线程访问\n- 应该使用 submit() 而不是 submitAsync()\n\n注意: submitAsync() 只适用于支持多线程的语言，JavaScript 必须使用 submit()\n\nScheduler 接口的延迟参数行为\n- 零延迟的任务会立即执行\n- 负延迟的任务也会立即执行（不会抛出异常）\n- 负延迟被当作零延迟处理\n\n注意: 如果需要延迟执行，确保延迟参数为正数\n\nScheduler 接口的脚本函数调用\n- 即使脚本名或函数名不存在，submit() 也不会在提交时抛出异常\n- 错误可能在任务执行时才发生\n- 需要确保脚本名和函数名正确\n\n注意: 提交任务前应该验证脚本和函数是否存在"
   :parameters="[
     { name: 'submit', type: '(task: () => void): void', required: true, description: '提交同步任务' },
     { name: 'submitAsync', type: '(task: () => void): void', required: true, description: '提交异步任务' },

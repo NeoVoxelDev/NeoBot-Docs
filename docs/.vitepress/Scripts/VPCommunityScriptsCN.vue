@@ -32,13 +32,28 @@ const fetchScripts = async () => {
     isLoading.value = true
     error.value = null
 
-    const response = await fetch('https://gh-proxy.org/https:/github.com/NeoVoxelDev/NeoBotScriptsRepo/raw/refs/heads/main/repo.json')
+    const mirrors = [
+      'https://gh-proxy.org/https://github.com/NeoVoxelDev/NeoBotScriptsRepo/raw/refs/heads/main/repo.json',
+      'https://v6.gh-proxy.org/https://github.com/NeoVoxelDev/NeoBotScriptsRepo/raw/refs/heads/main/repo.json',
+      'https://hk.gh-proxy.org/https://github.com/NeoVoxelDev/NeoBotScriptsRepo/raw/refs/heads/main/repo.json',
+      'https://cdn.gh-proxy.org/https://github.com/NeoVoxelDev/NeoBotScriptsRepo/raw/refs/heads/main/repo.json',
+      'https://edgeone.gh-proxy.org/https://github.com/NeoVoxelDev/NeoBotScriptsRepo/raw/refs/heads/main/repo.json',
+      'https://github.com/NeoVoxelDev/NeoBotScriptsRepo/raw/refs/heads/main/repo.json'
+    ]
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
+    const fetchPromises = mirrors.map(async (url) => {
+      try {
+        const response = await fetch(url)
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        return await response.json()
+      } catch (err) {
+        throw err
+      }
+    })
 
-    const data: RepoData = await response.json()
+    const data: RepoData = await Promise.any(fetchPromises)
     scripts.value = data.plugins || []
   } catch (err) {
     console.error('获取脚本失败:', err)

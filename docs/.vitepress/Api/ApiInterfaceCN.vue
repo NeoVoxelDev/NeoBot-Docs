@@ -5,11 +5,21 @@
         <h3>{{ interfaceName }}</h3>
         <div class="interface-type" :class="typeClass">{{ interfaceType }}</div>
       </div>
-      <div class="expand-icon" :class="{ expanded: isExpanded }">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
+      <div class="header-right">
+        <div class="tip-icon" v-if="tip" @click.stop="showTipModalWithExpand" title="查看提示">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <div class="expand-icon" :class="{ expanded: isExpanded }">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
       </div>
     </div>
 
@@ -66,6 +76,26 @@
         </div>
       </div>
     </transition>
+
+    <transition name="modal">
+      <div class="tip-modal" v-if="showTipModal" @click.self="showTipModal = false">
+        <div class="tip-modal-content">
+          <div class="tip-modal-header">
+            <h4>接口提示</h4>
+            <button class="close-button" @click="showTipModal = false">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          <div class="tip-modal-body">
+            <div class="tip-content">{{ formattedTip }}</div>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -93,6 +123,7 @@ interface Props {
   example?: string;
   exampleDescription?: string;
   initiallyExpanded?: boolean;
+  tip?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -101,9 +132,15 @@ const props = withDefaults(defineProps<Props>(), {
 
 const isExpanded = ref(props.initiallyExpanded);
 const highlightedLine = ref<number | null>(null);
+const showTipModal = ref(false);
 
 const toggleExpanded = () => {
   isExpanded.value = !isExpanded.value;
+};
+
+const showTipModalWithExpand = () => {
+  isExpanded.value = true;
+  showTipModal.value = true;
 };
 
 const typeClass = computed(() => {
@@ -125,8 +162,12 @@ const typeClass = computed(() => {
 
 const formattedExample = computed(() => {
   if (!props.example) return '';
-  // 将 \n 转换为实际的换行符
   return props.example.replace(/\\n/g, '\n');
+});
+
+const formattedTip = computed(() => {
+  if (!props.tip) return '';
+  return props.tip.replace(/\\n/g, '\n');
 });
 
 const exampleLines = computed(() => {
@@ -198,6 +239,29 @@ const copyToClipboard = async (text: string) => {
   font-weight: 500;
   color: white;
   letter-spacing: 0.3px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tip-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--vp-c-warning);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.tip-icon:hover {
+  background: rgba(var(--vp-c-warning-rgb), 0.1);
+  transform: scale(1.1);
 }
 
 .type-function {
@@ -501,6 +565,25 @@ const copyToClipboard = async (text: string) => {
   transform: translateY(0);
 }
 
+/* 模态框动画 */
+.modal-enter-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-to,
+.modal-leave-from {
+  opacity: 1;
+}
+
 @media (max-width: 768px) {
   .param-item {
     flex-direction: column;
@@ -511,5 +594,83 @@ const copyToClipboard = async (text: string) => {
   .param-name {
     min-width: auto;
   }
+}
+
+.tip-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.tip-modal-content {
+  background: var(--vp-c-bg);
+  border-radius: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  box-shadow: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.tip-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--vp-c-border);
+  background: rgba(var(--vp-c-bg-soft-rgb), 0.5);
+}
+
+.tip-modal-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.close-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  color: var(--vp-c-text-2);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.close-button:hover {
+  background: rgba(var(--vp-c-text-2-rgb), 0.1);
+  color: var(--vp-c-text-1);
+}
+
+.tip-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.tip-content {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.6;
+  color: var(--vp-c-text-1);
+  font-size: 14px;
 }
 </style>
