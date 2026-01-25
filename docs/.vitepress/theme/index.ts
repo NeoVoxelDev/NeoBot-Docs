@@ -1,6 +1,8 @@
 /* .vitepress/theme/index.ts */
 import DefaultTheme from 'vitepress/theme'
 import './style/index.css'
+import './style/dark.css'
+import './style/wallpaper-progress.css'
 import MyLayout from './components/MyLayout.vue'
 import Linkcard from "./components/Linkcard.vue"
 import update from "./components/update.vue"
@@ -41,8 +43,23 @@ export default {
       mediumZoom(".main img", { background: "var(--vp-c-bg)" });
     };
 
+    const initWallpaper = () => {
+      const wallpaperUrl = 'https://api.armoe.cn/acg/random';
+      const img = new Image();
+      img.src = wallpaperUrl;
+
+      img.onload = () => {
+        document.body.classList.add('wallpaper-loaded');
+      };
+
+      img.onerror = () => {
+        document.body.classList.add('wallpaper-loaded');
+      };
+    };
+
     onMounted(() => {
       initZoom();
+      initWallpaper();
     });
 
     watch(

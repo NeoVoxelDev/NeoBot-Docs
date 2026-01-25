@@ -3,7 +3,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const isMenuOpen = ref(false)
 const isCursorEnabled = ref(true)
-const isSmoothScrollEnabled = ref(true)
+const isSmoothScrollEnabled = ref(false)
 
 let customCursorInstance: any = null
 let smoothScrollInstance: any = null
@@ -53,15 +53,90 @@ const toggleSmoothScroll = () => {
   }
 }
 
+const refreshWallpaper = () => {
+  const MIN_LOADING_TIME = 2000
+
+  document.body.classList.remove('wallpaper-loaded')
+  document.body.classList.add('wallpaper-loading')
+
+  const progressContainer = document.createElement('div')
+  progressContainer.className = 'wallpaper-progress'
+  const progressBar = document.createElement('div')
+  progressBar.className = 'wallpaper-progress-bar'
+  progressContainer.appendChild(progressBar)
+  document.body.appendChild(progressContainer)
+
+  const updateProgress = (percent: number) => {
+    progressBar.style.width = percent + '%'
+  }
+
+  const hideProgress = () => {
+    progressContainer.style.opacity = '0'
+    progressContainer.style.transition = 'opacity 0.3s ease-out'
+    setTimeout(() => {
+      progressContainer.remove()
+    }, 300)
+  }
+
+  const timestamp = Date.now()
+  const newWallpaperUrl = `https://api.armoe.cn/acg/random?t=${timestamp}`
+
+  const startTime = Date.now()
+  let progress = 10
+
+  updateProgress(progress)
+
+  const progressInterval = setInterval(() => {
+    const elapsed = Date.now() - startTime
+    const progressPercent = Math.min(80, 10 + (elapsed / MIN_LOADING_TIME) * 70)
+    progress = progressPercent
+    updateProgress(progress)
+  }, 100)
+
+  const img = new Image()
+  img.src = newWallpaperUrl
+
+  img.onload = () => {
+    const elapsed = Date.now() - startTime
+    const remainingTime = Math.max(0, MIN_LOADING_TIME - elapsed)
+
+    setTimeout(() => {
+      clearInterval(progressInterval)
+      updateProgress(100)
+
+      let wallpaperStyle = document.getElementById('wallpaper-style')
+      if (!wallpaperStyle) {
+        wallpaperStyle = document.createElement('style')
+        wallpaperStyle.id = 'wallpaper-style'
+        document.head.appendChild(wallpaperStyle)
+      }
+      wallpaperStyle.textContent = `body:before { background: url('${newWallpaperUrl}') center / cover !important; }`
+
+      document.body.classList.remove('wallpaper-loading')
+      document.body.classList.add('wallpaper-loaded')
+
+      setTimeout(() => {
+        hideProgress()
+      }, 300)
+    }, remainingTime)
+  }
+
+  img.onerror = () => {
+    clearInterval(progressInterval)
+    document.body.classList.remove('wallpaper-loading')
+    document.body.classList.add('wallpaper-loaded')
+    hideProgress()
+  }
+}
+
 onMounted(() => {
   if (typeof window !== 'undefined' && window.CustomCursor) {
     customCursorInstance = new window.CustomCursor()
     isCursorEnabled.value = true
   }
-  if (typeof window !== 'undefined' && window.SmoothScroll) {
+  if (typeof window !== 'undefined' && window.SmoothScroll && isSmoothScrollEnabled.value) {
     smoothScrollInstance = new window.SmoothScroll()
     window.smoothScroll = smoothScrollInstance
-    isSmoothScrollEnabled.value = true
   }
 })
 
@@ -100,6 +175,14 @@ onBeforeUnmount(() => {
         <div class="switch" :class="{ 'is-active': isSmoothScrollEnabled }">
           <div class="switch-slider"></div>
         </div>
+      </div>
+      <div class="menu-divider"></div>
+      <div class="menu-item" @click="refreshWallpaper">
+        <span class="menu-label">刷新壁纸</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+        </svg>
       </div>
     </div>
   </div>
@@ -156,6 +239,15 @@ onBeforeUnmount(() => {
   padding: 12px 16px;
   cursor: pointer;
   transition: background-color 0.2s;
+}
+
+.menu-item svg {
+  color: var(--vp-c-text-2);
+  transition: color 0.2s;
+}
+
+.menu-item:hover svg {
+  color: var(--vp-c-brand-1);
 }
 
 .menu-item:hover {
