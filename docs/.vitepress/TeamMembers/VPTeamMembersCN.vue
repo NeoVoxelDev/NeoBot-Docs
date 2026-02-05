@@ -56,6 +56,15 @@ const defaultMembers = [
       { icon : 'QQ', link: 'http://wpa.qq.com/msgrd?v=3&uin=3462689887&site=qq&menu=yes' },
       { icon : 'Bilibili', link: 'https://space.bilibili.com/696652305' }
     ]
+  },
+  {
+    avatar: 'https://www.github.com/jlxnb.png',
+    name: 'Pepper',
+    title: '开发者',
+    links: [
+      { icon: 'github', link: 'https://github.com/jlxnb' },
+      { icon : 'QQ', link: 'http://wpa.qq.com/msgrd?v=3&uin=2747789919&site=qq&menu=yes' }
+    ]
   }
 ]
 const getIconClass = (icon: string) => {
