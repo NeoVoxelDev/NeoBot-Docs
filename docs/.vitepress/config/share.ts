@@ -62,6 +62,7 @@ export const sharedConfig = defineConfig({
       md.use(timeline)
     }
   },
+  cleanUrls: true,
   themeConfig: {
     search: {
       provider: 'local',
