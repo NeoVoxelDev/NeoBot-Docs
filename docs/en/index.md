@@ -31,5 +31,14 @@ features:
   - icon: 🚀
     title: Extensive Compatibility
     details: Compatible with major server platforms such as Leaves, Leaf, Paper, and Purpur.
+  - icon: 🌐
+    title: Multi-Platform Support
+    details: Supports multiple chat platforms including Kook, QQ, and more.
+  - icon: 🔧
+    title: Rich Features
+    details: Offers a wide range of features such as chat commands, event listeners, and more.
+  - icon: 🔄
+    title: Continuous Updates
+    details: The plugin team remains committed to providing regular updates, bug fixes, and new features.
 ---
 <Confetti />
